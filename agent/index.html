@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1.0, width=device-width, maximum-scale=1.0, minimal-ui">
+  <title>Home</title>
+  <link rel="stylesheet" href="../assets/css/index.css" />
+</head>
+
+<body>
+  <header class="agent-header-container">
+    <div class="agent-header">
+      <h1 class="agent-header-title"><i>LiveHub</i></h1>
+      <span class="agent-header-invitation-link">Invitation Link for hosts</span>
+    </div>
+    <div class="agent-info-container">
+      <div><span class="agent-info-title">Agent Uid: </span> <span class="agent-info-content">1357924680123</span></div>
+      <div><span class="agent-info-title">Date Time: </span> <span class="agent-info-content">25-10-2020</span></div>
+      <div><span class="agent-info-title">Status: </span> <span class="agent-info-content">Valid</span></div>
+    </div>
+    <div class="agent-add-host-container">
+      <h2>My Hosts List</h2>
+      <div>
+        <div class="agent-add-host add-new">
+          <svg t="1605525301655" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1351" width="32" height="32"><path d="M511.445333 64c-217.429333 0-408.234667 158.549333-442.197333 380.074667-37.546667 244.522667 130.304 473.173333 374.826667 510.72 23.04 3.498667 45.909333 5.205333 68.48 5.205333 217.429333 0 408.234667-158.549333 442.197333-380.074667 37.546667-244.522667-130.304-473.173333-374.826667-510.72a451.584 451.584 0 0 0-68.48-5.205333m0 64c19.498667 0 39.253333 1.536 58.752 4.48a382.72 382.72 0 0 1 251.306667 152.32 382.72 382.72 0 0 1 69.973333 285.44 382.464 382.464 0 0 1-130.56 234.069333 383.829333 383.829333 0 0 1-558.421333-65.109333 382.72 382.72 0 0 1-69.973333-285.44A382.464 382.464 0 0 1 263.04 219.733333 383.829333 383.829333 0 0 1 511.445333 128" p-id="1352" fill="#FFFFFF"></path><path d="M512 320a32 32 0 0 1 31.701333 27.648l0.298667 4.352v128h128a32 32 0 0 1 31.701333 27.648L704 512a32 32 0 0 1-27.648 31.701333l-4.352 0.298667h-128v128a32 32 0 0 1-27.648 31.701333L512 704a32 32 0 0 1-31.701333-27.648l-0.298667-4.352v-128h-128a32 32 0 0 1-31.701333-27.648L320 512a32 32 0 0 1 27.648-31.701333l4.352-0.298667h128v-128a32 32 0 0 1 27.648-31.701333L512 320z" p-id="1353" fill="#FFFFFF"></path></svg>
+          <span>Add New Host</span>
+        </div>
+        <div class="agent-add-host input-uid">
+          <svg t="1605525301655" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1351" width="32" height="32"><path d="M511.445333 64c-217.429333 0-408.234667 158.549333-442.197333 380.074667-37.546667 244.522667 130.304 473.173333 374.826667 510.72 23.04 3.498667 45.909333 5.205333 68.48 5.205333 217.429333 0 408.234667-158.549333 442.197333-380.074667 37.546667-244.522667-130.304-473.173333-374.826667-510.72a451.584 451.584 0 0 0-68.48-5.205333m0 64c19.498667 0 39.253333 1.536 58.752 4.48a382.72 382.72 0 0 1 251.306667 152.32 382.72 382.72 0 0 1 69.973333 285.44 382.464 382.464 0 0 1-130.56 234.069333 383.829333 383.829333 0 0 1-558.421333-65.109333 382.72 382.72 0 0 1-69.973333-285.44A382.464 382.464 0 0 1 263.04 219.733333 383.829333 383.829333 0 0 1 511.445333 128" p-id="1352" fill="#1E3B77"></path><path d="M512 320a32 32 0 0 1 31.701333 27.648l0.298667 4.352v128h128a32 32 0 0 1 31.701333 27.648L704 512a32 32 0 0 1-27.648 31.701333l-4.352 0.298667h-128v128a32 32 0 0 1-27.648 31.701333L512 704a32 32 0 0 1-31.701333-27.648l-0.298667-4.352v-128h-128a32 32 0 0 1-31.701333-27.648L320 512a32 32 0 0 1 27.648-31.701333l4.352-0.298667h128v-128a32 32 0 0 1 27.648-31.701333L512 320z" p-id="1353" fill="#1E3B77"></path></svg>
+          <input type="text" id="exists-host-uid" class="no" placeholder="Input Host’s Uid" />
+        </div>
+      </div>
+    </div>
+  </header>
+  <!--  -->
+  <section class="agent-host-lists">
+    <h3>Uid</h3>
+    <h3>Nickname</h3>
+    <h3>Avatar</h3>
+    <h3 class="other-info">Other Info</h3>
+    <h3 class="time-of-calls">Time of calls</h3>
+    <h3 class="work-hours">Work hours</h3>
+    <h3 class="status">Status</h3>
+    <h3 class="manage">Manage</h3>
+    <!--  -->
+    <div class="uid">1357924680123</div>
+    <div class="nickname">Jasica</div>
+    <div class="avatar"><img src="../assets/img/photo-2.png"></div>
+    <div class="other-info">White Girl, from LA.CA</div>
+    <div class="time-of-calls">16</div>
+    <div class="work-hours">2.5</div>
+    <div class="status">Invalid</div>
+    <div class="manage">
+      <span class="delete manage-option">Delete</span>
+      <label class="freeze">
+        <input type="checkbox" class="agent-freeze-host" /> <span class="manage-option">Freeze</span>
+      </label>
+    </div>
+  </section>
+
+</body>
+<script src="../assets/js/index.js"></script>
+</html>

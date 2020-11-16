@@ -1,5 +1,7 @@
+/* ------------------------------------ Default ------------------------------------ */
 html, body {
     padding: 0;
+    margin: 0;
     font-size: 20px;
 }
 * {
@@ -19,6 +21,10 @@ html, body {
 .auto-margin > *:last-child {
     margin-bottom: 0;
 }
+.content-block-1 {
+    max-width: 90%;
+    margin-left: 5%;
+}
 .content-block-title {
     max-width: 90%;
     /* margin: 10px 0 10px 10%; */
@@ -29,10 +35,27 @@ html, body {
     font-family: Roboto Bold;
     line-height: 21px;
 }
-.content-block-1 {
-    max-width: 90%;
-    margin-left: 5%;
+input.no-border {
+    border: none;
 }
+input.no-border:focus {
+    border: none;
+}
+input.no-outline {
+    outline: none;
+}
+input.no-outline:focus {
+    outline: none;
+}
+input.no {
+    border: none;
+    outline: none;
+}
+input.no:focus {
+    border: none;
+    outline: none;
+}
+/* ------------------------------------ Default ------------------------------------ */
 /* Header */
 .header-title {
     font-size: 26px;
@@ -174,4 +197,295 @@ textarea.contact-info {
 .submit-info:hover {
     cursor: pointer;
     box-shadow: 0 0 10px 0 #1E3B7766;
+}
+
+/* ------------------------------------ Login Page ------------------------------------ */
+.login-and-signup-container {
+    width: 100%;
+    height: 100vh;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-and-signup {
+    width: 100%;
+    max-width: 420px;
+    min-width: 360px;
+}
+.login-and-signup > * {
+    width: 100%;
+    margin-bottom: 20px;
+}
+.login-and-signup-title {
+    font-size: 26px;
+    line-height: 31px;
+    color: #000;
+    font-family: Helvetica Bold;
+    font-weight: bold;
+    text-align: center;
+}
+
+.login-and-signup-lists {
+    display: flex;
+    justify-content: space-around;
+}
+.login-and-signup-item {
+    width: 78px;
+    text-align: center;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+}
+.login-and-signup-icon {
+    width: 78px;
+    height: 78px;
+    transition: all 0.4s ease-out;
+}
+.login-and-signup-icon:hover {
+    transform: scale(1.05);
+}
+.login-and-signup-text {
+    font-size: 14px;
+    line-height: 19px;
+    color: #7C7C7C;
+    font-family: Roboto Regular;
+}
+
+.login-and-signup-info > * {
+    width: 100%;
+}
+.login-and-signup-info > *:first-child {
+    margin-bottom: 33px;
+}
+.forget-password {
+    text-align: right;
+    color: #000;
+    font-size: 14px;
+    line-height: 17px;
+    font-family: Helvetica;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+}
+.forget-password:hover {
+    text-shadow: 0 0 1px #000;
+}
+.submit-login-info {
+    background-color: #1E3B77;
+    font-size: 22px;
+    font-family: Helvetica-Bold, Helvetica;
+    font-weight: bold;
+    color: #FFFFFF;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+}
+.submit-login-info:hover {
+    box-shadow: 0 0 5px 0 #425f99 ;
+}
+
+/* ------------------------------------ Agent Page ------------------------------------ */
+.agent-header-container, .agent-host-lists {
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+}
+.agent-header-container > *, .agent-host-lists > * {
+    width: 100%;
+}
+.agent-header-container {
+    padding: 20px;
+    background-color: #FFF;
+}
+.agent-host-lists {
+    padding: 10px;
+    background-color: #F6F6F6;
+}
+@media screen and ( min-width: 1000px ){
+    .agent-header-container { padding: 36px 40px 46px 44px; }
+    .agent-host-lists { padding: 53px 35px 53px 40px; }
+}
+/* header */
+.agent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 46px;
+}
+.agent-header-title {
+    font-size: 18px;
+    font-family: Helvetica-BoldOblique, Helvetica;
+    font-weight: normal;
+    color: #1E3B77;
+    line-height: 22px;
+    font-weight: bold;
+}
+.agent-header-invitation-link {
+    font-size: 14px;
+    font-family: Helvetica;
+    color: #6e6e6e;
+    opacity: 0.7;
+    line-height: 24px;
+    padding: 0 13px;
+    border-radius: 13px;
+    border: 1px solid #979797;
+    transition: all 0.4s ease-in-out;
+    cursor: pointer;
+}
+.agent-header-invitation-link:hover {
+    opacity: 1;
+}
+
+.agent-info-container > * {
+    width: 100%;
+    margin-bottom: 28px;
+}
+.agent-info-container > *:last-child {
+    margin-bottom: 32px;
+}
+.agent-info-tile {
+    font-size: 16px;
+    font-family: Helvetica-Bold, Helvetica;
+    font-weight: bold;
+    color: #000000;
+    line-height: 19px;
+}
+.agent-info-content {
+    font-size: 16px;
+    font-family: Helvetica;
+    color: #000000;
+    line-height: 19px;
+}
+/*  */
+.agent-add-host-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.agent-add-host-container > h2 {
+    font-size: 26px;
+    font-family: Helvetica-Bold, Helvetica;
+    font-weight: bold;
+    color: #000000;
+    line-height: 31px;
+}
+.agent-add-host-container > div {
+    display: flex;
+}
+@media screen and ( max-width: 700px ) {
+    .agent-add-host-container { flex-direction: column-reverse; align-items: flex-start; }
+}
+@media screen and ( max-width: 500px ) {
+    .agent-add-host-container > div { flex-direction: column;}
+    .agent-add-host-container > div > *:last-child { margin: 20px 0 0 0;}
+}
+.agent-add-host {
+    display: inline-block;
+    width: 218px;
+    height: 53px;
+    border-radius: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #1E3B77;
+    line-height: 49px;
+    font-size: 18px;
+    font-family: Helvetica;
+    transition: all 0.4s ease-in-out;
+}
+.agent-add-host:hover {
+    cursor: pointer;
+    box-shadow: 0 0 5px 0 #6a87c0;
+}
+.agent-add-host > *:last-child {
+    margin-left: 10px;
+}
+.agent-add-host + .agent-add-host {
+    margin-left: 22px;
+}
+.agent-add-host.add-new {
+    background-color: #1E3B77;
+    color: #FFF;
+}
+.agent-add-host.input-uid {
+    background-color: #FFF;
+    color: #A7A7A7;
+}
+.agent-add-host.input-uid > input {
+    width: 115px;
+}
+
+.agent-host-lists {
+    display: grid;
+    grid-template-columns: 130px 110px 130px 136px 122px 120px 80px  100px;
+}
+@media screen and ( max-width: 500px ) {
+    .agent-host-lists {
+        grid-template-columns: 120px 100px 120px;
+    }
+    .agent-host-lists > .other-info { display: none; }
+    .agent-host-lists > .time-of-calls { display: none; }
+    .agent-host-lists > .work-hours { display: none; }
+    .agent-host-lists > .status { display: none; }
+    .agent-host-lists > .manage { display: none; }
+}
+.agent-host-lists > * {
+    overflow: hidden;
+    border: 1px solid black;
+    margin: 0;
+    text-align: center;
+    font-size: 14px;
+    font-family: Helvetica;
+    color: #000000;
+    line-height: 19px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 1px 0.5px #000;
+}
+.agent-host-lists > h3 {
+    font-size: 16px;
+    font-family: Helvetica-Bold, Helvetica;
+    font-weight: bold;
+    color: #000000;
+    line-height: 40px;
+}
+.agent-host-lists > div.uid {
+    color: #33A1D2;
+    cursor: pointer;
+}
+.agent-host-lists > div.other-info {
+    text-align: left;
+}
+.agent-host-lists > div.manage {
+    flex-direction: column;
+}
+.agent-host-lists > div.manage > * {
+    display: inline-block;
+    width: 100%;
+}
+.agent-host-lists > div.manage  .manage-option {
+    display: inline-block;
+    width: 100%;
+    border-radius: 13px;
+    border: 1px solid #979797;
+    font-size: 12px;
+    text-align: center;
+    line-height: 25px;
+    cursor: pointer;
+}
+.agent-host-lists > div.manage > .delete {
+    color: #979797;
+    margin-bottom: 10px;
+}
+.agent-freeze-host {
+    display: none;
+}
+.agent-freeze-host:checked + span {
+    background-color: #1E3B77;
+    color: #FFF;
 }
