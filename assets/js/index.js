@@ -39,16 +39,11 @@ function dialog(show, cssSelector){
         showView(document.getElementById("dialog-modal"), config.dialogShowNum>0 ? "flex" : "none");
     }
 }
-
-document.querySelector("#dialog-modal").addEventListener("click", function(event){
-    if(event.target.id === "dialog-modal"){
-        console.log("You Click dialog-modal");
-        config.dialogs.forEach((v, k) => {
-            if(v && k.getAttribute("uncancellable") !== "true") dialog(false, "#"+k.id);
-        });
-    }
-});
 /* ------------------------------------ Apply Page ------------------------------------ */
+
+function initApplyPage(){
+
+}
 
 var applyViews = {
     imageList: document.querySelector(".image-list")
@@ -66,12 +61,39 @@ function chooseImage(ele){
     applyViews.imageList.insertBefore(newImg, ele.parentElement);
 }
 
-/* ------------------------------------ Apply Page ------------------------------------ */
+/* ------------------------------------ Agent Page ------------------------------------ */
 var agentConfig = {
-    uploadHostAvatar: null
+    uploadHostAvatar: null,
+    addHostUid: null,
+    addHostFromExists: true
 }
 var agentViews = {
+}
 
+function initAgentPage(){
+    document.querySelector("#dialog-modal").addEventListener("click", function(event){
+        if(event.target.id === "dialog-modal"){
+            console.log("You Click dialog-modal");
+            config.dialogs.forEach((v, k) => {
+                if(v && k.getAttribute("uncancellable") !== "true") dialog(false, "#"+k.id);
+            });
+        }
+    });
+}
+
+function changeAddHostMethod(isChecked){
+    agentConfig.addHostFromExists = isChecked;
+    console.log(isChecked);
+    let nickname = document.querySelector(".agent-upload-host-info-container .host-nickname");
+    let avatar = document.querySelector(".agent-upload-host-info-container .host-avatar");
+    if(!isChecked) {
+        nickname.setAttribute("disabled", "true");
+        avatar.setAttribute("disabled", "true");
+    }
+    else {
+        nickname.removeAttribute("disabled");
+        avatar.removeAttribute("disabled");
+    }
 }
 
 function agentUploadHostAvatar(ele){
@@ -90,23 +112,46 @@ function agentUploadHostAvatar(ele){
 }
 
 function agentUploadHostInfo(ele){
-    if(!agentConfig.uploadHostAvatar) {
-        alert("Please upload a avatar");
-        return;
-    }
     let parent = parentByClass(ele, "dialog");
-    let inputs = parent.querySelectorAll("input:not(.host-avatar)");
+    let inputs = parent.querySelectorAll("input:not(.no-text)");
     let form = new FormData();
     form.append("avatar", agentConfig.uploadHostAvatar);
+    let hasEmpty = false;
     for(let i=0; i<inputs.length; i++){
         let value = inputs[i].value;
-        if(value.trim() === ""){
-            alert("Please check your input.");
-            return;
-        }
+        if(value.trim() === "") hasEmpty = true;
         form.append(inputs[i].name, value);
     }
+    if(agentConfig.addHostFromExists) {
+        if(!agentConfig.uploadHostAvatar){
+            alert("Please upload a avatar");
+            return;
+        }
+        if(hasEmpty){
+            alert("Please check your input");
+            return;
+        }
+    }
+    
     form.forEach((v, k) => {
         console.log(`${k} => ${v}`);
-    })
+    });
+}
+
+// 
+function agentDeleteHost(ele){
+    let parent = parentByClass(ele, "agent-host-item");
+    let uid = parent.querySelector(".uid");
+    alert("Delete: " + uid.innerText);
+}
+function agentFreezeHost(ele){
+    let parent = parentByClass(ele, "agent-host-item");
+    let status = parent.querySelector(".status");
+    status.innerText = ele.checked ? "valid" : "invalid";
+}
+
+/* ------------------------------------ Agent Page ------------------------------------ */
+
+function initHostPage(){
+
 }
