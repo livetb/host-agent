@@ -35,6 +35,10 @@ html, body {
     font-family: Roboto Bold;
     line-height: 21px;
 }
+/* input */
+input.file {
+    display: none;
+}
 input.no-border {
     border: none;
 }
@@ -55,7 +59,28 @@ input.no:focus {
     border: none;
     outline: none;
 }
-/* ------------------------------------ Default ------------------------------------ */
+
+/* ------------------------------------ Modal ------------------------------------ */
+.modal {
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    background-color: #252525c2;
+    display: none;
+}
+.dialog {
+    display: none;
+    position: absolute;
+    padding: 20px 30px;
+    background-color: #FFF;
+}
+/* ------------------------------------ Apply Page ------------------------------------ */
 /* Header */
 .header-title {
     font-size: 26px;
@@ -488,4 +513,79 @@ textarea.contact-info {
 .agent-freeze-host:checked + span {
     background-color: #1E3B77;
     color: #FFF;
+}
+/* create new host dialog */
+.dialog-create-new-host {
+    text-align: center;
+}
+.dialog-create-new-host > * + .dialog-create-new-host > * {
+    margin-top: 20px;
+}
+.dialog-create-new-host .dialog-title {
+    font-size: 18px;
+    font-family: Helvetica-Bold, Helvetica;
+    font-weight: bold;
+    color: #1E3B77;
+    line-height: 22px;
+}
+.agent-upload-host-info-container {
+    display: grid;
+    grid-template-columns: 77px 150px;
+    row-gap: 20px;
+}
+.agent-upload-host-info-container > * {
+    height: 37px;
+}
+.agent-upload-host-info-container > .title {
+    line-height: 37px;
+    font-size: 14px;
+    margin: 0;
+    font-family: Helvetica-Bold, Helvetica;
+    font-weight: bold;
+    color: #000000;
+    text-align: left;
+}
+.agent-upload-host-info-container > .input {
+    padding: 10px 15px;
+    font-size: 14px;
+    font-family: Helvetica;
+    color: #1E3B77;
+    line-height: 17px;
+    border-radius: 19px;
+    border: 1px solid #E6E6E6;
+    transition: all 0.4s ease-in-out;
+}
+.agent-upload-host-info-container > .input:hover {
+    box-shadow: 0 0 5px 0 #E6E6E6;
+}
+.agent-upload-host-info-container > .input.avatar {
+    border-color: #1E3B77;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.agent-upload-host-info-container > .show-avatar {
+    width: 100%;
+    height: 100%;
+    line-height: 150px;
+    color: #000a;
+    display: none;
+}
+.agent-upload-host-info-container > .input.avatar .icon {
+    display: inline-block;
+    margin-right: 10px;
+}
+.dialog-create-new-host .submit {
+    width: 100px;
+    margin: 34px auto 0 auto;
+    line-height: 38px;
+    text-align: center;
+    background: #1E3B77;
+    border-radius: 27px;
+    color: #FFF;
+    transition: all 0.4s ease-in-out;
+}
+.dialog-create-new-host .submit:hover {
+    cursor: pointer;
+    box-shadow: 0 0 5px 0 #8194b9;
 }
