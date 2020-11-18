@@ -1,18 +1,61 @@
 'use strict'
 /* ------------------------------------ Toolkit ------------------------------------ */
+function StorageHelper(app) {
+    this.app = app;
+}
+StorageHelper.prototype.setItem = function (key, value) {
+    key = this.app + "_" + key;
+    localStorage.setItem(key, value);
+    return value;
+}
+StorageHelper.prototype.getItem = function (key) {
+    key = key = this.app + "_" + key;
+    return localStorage.getItem(key);
+}
+StorageHelper.prototype.removeItems = function () {
+    console.log(arguments);
+    for (var i in arguments) {
+        var key = this.app + "_" + arguments[i];
+        localStorage.removeItem(key);
+    }
+}
+StorageHelper.prototype.clear = function () {
+    for (var key in localStorage) {
+        if (key.match(this.app)) localStorage.removeItem(key);
+    }
+}
+const storageHelper = new StorageHelper("Livehub");
+
+/** config */
 var config = {
     dialogShowNum: 0,
-    dialogs: new Map()
+    dialogs: new Map(),
+    isTest: true,
+    domain: "t.livego.live"
+}
+/**
+ * Api
+ * @param {String} path - '/xxx/xx'
+ */
+function getUrl(path) {
+    let url = `https://${config.domain}${path}`;
+    console.log("Get Url => ", url);
+    return url;
+}
+function getHeaders() {
+    return {
+        authorization: storageHelper.getItem("token") || "1111"
+    }
 }
 /**
  * Get parent element by class name.
  * @param {HTMLElement} ele - Child HTMLELement
  * @param {String} classStr - Class Name
  */
-function parentByClass(ele, classStr){
-    if(!ele) return false;
-    if(ele.classList.contains(classStr)) return ele;
-    if(ele.parentElement.classList.contains(classStr)) return ele.parentElement;
+function parentByClass(ele, classStr) {
+    if (!ele) return false;
+    if (ele.classList.contains(classStr)) return ele;
+    if (ele.parentElement.classList.contains(classStr)) return ele.parentElement;
     return parentByClass(ele.parentElement, classStr);
 }
 /**
@@ -23,38 +66,163 @@ async function sleep(seconds) {
     return new Promise(resolve => setTimeout(resolve, seconds * 1000));
 }
 
-function showView(ele, displayName){
-    if(ele.style.display === displayName) return false;
+function showView(ele, displayName) {
+    if (ele.style.display === displayName) return false;
     ele.style.display = displayName;
     return true;
 }
 
-function dialog(show, cssSelector){
+function dialog(show, cssSelector) {
     let dialog = document.querySelector(cssSelector);
-    if(!dialog) return;
-    if(showView(dialog, show ? "block" : "none")){
+    if (!dialog) return;
+    if (showView(dialog, show ? "block" : "none")) {
         config.dialogs.set(dialog, show);
         config.dialogShowNum += (show ? 1 : -1);
         console.log(`Show： ${show} => ${config.dialogShowNum}`);
-        showView(document.getElementById("dialog-modal"), config.dialogShowNum>0 ? "flex" : "none");
+        showView(document.getElementById("dialog-modal"), config.dialogShowNum > 0 ? "flex" : "none");
     }
+}
+/* ------------------------------------ All Page ------------------------------------ */
+var firebaseConfig = {
+    apiKey: "AIzaSyBackILVX7DNOzavilBp92H6_UKGop9V6o",
+    authDomain: "liveworld-cb549.firebaseapp.com",
+    databaseURL: "https://liveworld-cb549.firebaseio.com",
+    projectId: "liveworld-cb549",
+    storageBucket: "liveworld-cb549.appspot.com",
+    messagingSenderId: "51543539109",
+    appId: "1:51543539109:web:63b65aa6b34e4ad1b9bc4c",
+    measurementId: "G-7RT79YZ4TB"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+
+/** login */
+function md5Login(firebaseUid, requestTime) {
+    var key = "fjsihWdgr;_#78JI9&)!kjdfgLKGRFeu342";
+    var str = firebaseUid + requestTime + key;
+    return hex_md5(str).toUpperCase();
+}
+function login(isManul) {
+    console.log("Login => ", config.user);
+    let url = getUrl("/api2/user/login");
+    let requestTime = Date.now();
+    let dataObj = {
+        appId: "302",
+        appKey: "fjsihWdgr;_#78JI9&)!kjdfgLKGRFeu342",
+        loginId: config.user.email,
+        thirdType: +storageHelper.getItem("thirdType") || 1,
+        deviceCode: storageHelper.getItem("deviceCode") || storageHelper.setItem("deviceCode", Math.random().toString().substr(2)),
+        deviceType: 4,
+        requestTime: requestTime,
+        firebaseCode: config.user.uid,
+        sign: md5Login(config.user.email, requestTime)
+    }
+    axios.post(url, dataObj).then(res => {
+        console.log(res.data);
+        if (res.data.status == 0) {
+            console.log("Login Success => ", res.data);
+            storageHelper.setItem("token", res.data.data.token);
+            alert("Login Success");
+            window.location.href = "/agent/";
+        } else if (res.data.status == 2001) alert(res.data.msg);
+    }).catch(error => console.error(error));
+}
+
+firebase.auth().onAuthStateChanged(function (user) {
+    console.log("FirebaseAuthChanged => ", user);
+    config.user = user;
+    storageHelper.setItem("user", JSON.stringify(user));
+    if(document.querySelector(".login-and-signup")) document.querySelector(".login-and-signup").classList.remove("upload-await");
+    if (user) {
+        // User is signed in.
+        var displayName = user.displayName;
+        var email = user.email;
+        var emailVerified = user.emailVerified;
+        var photoURL = user.photoURL;
+        var isAnonymous = user.isAnonymous;
+        var uid = user.uid;
+        var providerData = user.providerData;
+        if(/\/login\//.test(location.pathname)) login();
+    } else {
+        // User is signed out.
+        // ...
+    }
+});
+
+/* ------------------------------------ Login Page ------------------------------------ */
+var loginConfig = {
+    inLogin: false
+}
+function initLoginPage() {
+    console.log("Init LoginPage");
+}
+function signupByEmail() {
+    var email = document.getElementById("email").value.trim();
+    var password = document.getElementById("password").value.trim();
+    if (!email || !password) {
+        alert("Please check your login info.");
+        return;
+    }
+    document.querySelector(".login-and-signup").classList.add("upload-await");
+    firebase.auth().createUserWithEmailAndPassword(email, password).catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.log("SignupByEmail Failed => ", error);
+        if (errorCode === "auth/email-already-in-use") loginByEmail(email, password);
+        else document.querySelector(".login-and-signup").classList.remove("upload-await");
+        // ...
+    });
+}
+function loginByEmail(email, password) {
+    if (!email || !password) {
+        alert("Please check your login info.");
+        return;
+    }
+    document.querySelector(".login-and-signup").classList.add("upload-await");
+    storageHelper.setItem("thirdType", "1");
+    firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        storageHelper.removeItems("thirdType");
+        document.querySelector(".login-and-signup").classList.remove("upload-await");
+        console.log("SignupByEmail Failed => ", error);
+        // ...
+    });
+}
+function logout() {
+    firebase.auth().signOut().then(function () {
+        console.log("Logout Success");
+        storageHelper.clear();
+        window.location = "../../login/"
+    }).catch(function (error) {
+        console.log("Logout Failed => ", error);
+    });
 }
 /* ------------------------------------ Apply Page ------------------------------------ */
 
-function initApplyPage(){
+function initApplyPage() {
+    console.log("Init ApplyPage");
+}
 
+var applyConfig = {
+    upImgs: new Array()
 }
 
 var applyViews = {
     imageList: document.querySelector(".image-list")
 }
 
-function chooseImage(ele){
+function chooseImage(ele) {
     let file = ele.files[0];
-    if(!/image/.test(file.type)){
+    if (!/image/.test(file.type)) {
         alert("Should choose a image file.");
         return;
     }
+    if(applyConfig.upImgs.length > 1) applyConfig.upImgs.shift()
+    applyConfig.upImgs.push(file);
     applyViews.imageList.firstElementChild.remove();
     let newImg = document.createElement("img");
     newImg.src = URL.createObjectURL(file);
@@ -70,23 +238,12 @@ var agentConfig = {
 var agentViews = {
 }
 
-function initAgentPage(){
-    document.querySelector("#dialog-modal").addEventListener("click", function(event){
-        if(event.target.id === "dialog-modal"){
-            console.log("You Click dialog-modal");
-            config.dialogs.forEach((v, k) => {
-                if(v && k.getAttribute("uncancellable") !== "true") dialog(false, "#"+k.id);
-            });
-        }
-    });
-}
-
-function changeAddHostMethod(isChecked){
+function changeAddHostMethod(isChecked) {
     agentConfig.addHostFromExists = isChecked;
     console.log(isChecked);
     let nickname = document.querySelector(".agent-upload-host-info-container .host-nickname");
     let avatar = document.querySelector(".agent-upload-host-info-container .host-avatar");
-    if(!isChecked) {
+    if (!isChecked) {
         nickname.setAttribute("disabled", "true");
         avatar.setAttribute("disabled", "true");
     }
@@ -96,9 +253,9 @@ function changeAddHostMethod(isChecked){
     }
 }
 
-function agentUploadHostAvatar(ele){
+function agentUploadHostAvatar(ele) {
     let file = ele.files[0];
-    if(!/image/.test(file.type)){
+    if (!/image/.test(file.type)) {
         alert("Should choose a image file.");
         return;
     }
@@ -111,47 +268,155 @@ function agentUploadHostAvatar(ele){
     showView(preview, "inline-block");
 }
 
-function agentUploadHostInfo(ele){
+function agentUploadHostInfo(ele) {
     let parent = parentByClass(ele, "dialog");
     let inputs = parent.querySelectorAll("input:not(.no-text)");
     let form = new FormData();
     form.append("avatar", agentConfig.uploadHostAvatar);
     let hasEmpty = false;
-    for(let i=0; i<inputs.length; i++){
+    for (let i = 0; i < inputs.length; i++) {
         let value = inputs[i].value;
-        if(value.trim() === "") hasEmpty = true;
+        if (value.trim() === "") hasEmpty = true;
         form.append(inputs[i].name, value);
     }
-    if(agentConfig.addHostFromExists) {
-        if(!agentConfig.uploadHostAvatar){
+    if (agentConfig.addHostFromExists) {
+        if (!agentConfig.uploadHostAvatar) {
             alert("Please upload a avatar");
             return;
         }
-        if(hasEmpty){
+        if (hasEmpty) {
             alert("Please check your input");
             return;
         }
     }
-    
+
     form.forEach((v, k) => {
         console.log(`${k} => ${v}`);
     });
 }
 
 // 
-function agentDeleteHost(ele){
+function agentDeleteHost(ele) {
     let parent = parentByClass(ele, "agent-host-item");
     let uid = parent.querySelector(".uid");
     alert("Delete: " + uid.innerText);
 }
-function agentFreezeHost(ele){
+function agentFreezeHost(ele) {
     let parent = parentByClass(ele, "agent-host-item");
     let status = parent.querySelector(".status");
     status.innerText = ele.checked ? "valid" : "invalid";
 }
 
-/* ------------------------------------ Agent Page ------------------------------------ */
+function renderAgentHostList(arr){
+    let listNode = document.querySelector(".agent-host-lists");
+    let header = listNode.firstElementChild;
+    listNode.innerHTML = "";
+    listNode.appendChild(header);
+    let itemNode = null;
+    arr.forEach(value => {
+        itemNode = document.createElement("div");
+        itemNode.setAttribute("class", "agent-host-item");
+        itemNode.innerHTML = `<div class="uid">${value.uid}</div><div class="nickname">${value.nickname}</div><div class="avatar"><img src="${value.avatar}"></div><div class="other-info">${value.otherInfo || "No Other Info"}</div><div class="time-of-calls">${value.calls}</div><div class="work-hours">${value.minutes / 60}</div><div class="status">Invalid</div><div class="manage"><span onclick="agentDeleteHost(this)" class="delete manage-option">Delete</span><label class="freeze"><input onchange="agentFreezeHost(this)" type="checkbox" class="agent-freeze-host" /><span class="manage-option">Freeze</span></label></div>`;
+        listNode.appendChild(itemNode);
+    });
+}
 
-function initHostPage(){
+function agentGetHostList(){
+    let url = getUrl("/api/agent/hostList");
+    axios.post(url, {"query":{},"pageSize":20,"pageNum":1}, { headers: getHeaders()}).then(res => {
+        if(res.data.status === 0){
+            renderAgentHostList(res.data.data.records);
+        }else throw res.data.msg;
+    }).catch(error => {
+        console.error(error);
+    })
+}
+
+function initAgentPage() {
+    console.log("Init AgentPage");
+    document.querySelector("#dialog-modal").addEventListener("click", function (event) {
+        if (event.target.id === "dialog-modal") {
+            console.log("You Click dialog-modal");
+            config.dialogs.forEach((v, k) => {
+                if (v && k.getAttribute("uncancellable") !== "true") dialog(false, "#" + k.id);
+            });
+        }
+    });
+    agentGetHostList();
+}
+
+/* ------------------------------------ Host Page ------------------------------------ */
+var hostViews = {
 
 }
+
+function initHostPage() {
+    console.log("Init HostPage");
+    hostViews = {}
+    hostViews.statisticBlock = document.querySelector(".host-info-content-block-container > .host-info-statistic-table");
+    hostViews.giftLogs = document.querySelector(".host-info-content-block-container > .host-info-gift-logs-container");
+    hostViews.callLogs = document.querySelector(".host-info-content-block-container > .host-info-call-logs-container");
+}
+
+function toggleHostInfoBlock(ele) {
+    let position = +ele.value;
+    let pages = [hostViews.statisticBlock, hostViews.giftLogs, hostViews.callLogs];
+    for (let i = 0; i < pages.length; i++) {
+        showView(pages[i], i === position ? (0 === position ? "grid" : "block") : "none");
+    }
+}
+
+async function uploadCustomAvatar(avatar) {
+    await sleep(3);
+    return { status: 0, msg: "success" }
+}
+
+var hostUploadAvatar = (() => {
+    var inUpload = false;
+    return async function (ele) {
+        if (inUpload) {
+            console.log("In Upload");
+            return;
+        }
+        let file = ele.files && ele.files[0] || null;
+        if (!file) {
+            console.log("No Choose File.");
+            return;
+        } else if (!/image/.test(file.type)) {
+            alert("You Should Choose An Image File.");
+            return;
+        }
+        inUpload = true;
+        document.getElementById("host_avatar").setAttribute("disabled", "true");
+        let parent = parentByClass(ele, "host-info-avatar");
+        let avatarDiv = parent.querySelector("div:first-child");
+        avatarDiv.classList.add("upload-await");
+        let result = await uploadCustomAvatar(file);
+        avatarDiv.classList.remove("upload-await");
+        if (0 === result.status) {
+            alert("上传成功");
+            avatarDiv.firstElementChild.src = URL.createObjectURL(file);
+        } else {
+            alert("上传失败");
+        }
+        inUpload = false;
+        document.getElementById("host_avatar").removeAttribute("disabled");
+    }
+})();
+
+function saveHostProfile(ele) {
+    let parent = parentByClass(ele, "item");
+    console.log(ele.checked, parent)
+    if (ele.checked) parent.querySelector("input.content").removeAttribute("disabled");
+    else parent.querySelector("input.content").setAttribute("disabled", "true");
+}
+/* ------------------------------------ Init Page ------------------------------------ */
+function initPage() {
+    let path = location.pathname;
+    console.log("Init Page => ", path);
+    if (/\/login\//.test(path)) initLoginPage();
+    else if (/\/agent\//.test(path)) initAgentPage();
+    else if (/\/host\//.test(path)) initHostPage();
+    else initApplyPage();
+}
+initPage();

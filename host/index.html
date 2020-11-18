@@ -8,9 +8,10 @@
   <meta name="viewport" content="user-scalable=no, initial-scale=1.0, width=device-width, maximum-scale=1.0, minimal-ui">
   <title>HostPage</title>
   <link rel="stylesheet" href="../assets/css/index.css" />
+  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
 </head>
 
-<body onload="initHostPage()" class="host-page">
+<body class="host-page">
   <header class="host-header-container host-content-container">
     <div class="host-header">
       <h1 class="host-header-title"><i>LiveHub</i></h1>
@@ -23,21 +24,37 @@
     </div>
     <div class="host-content-block-1 host-info-container">
       <div class="host-info-avatar">
-        <img src="../assets/img/photo-1.png" />
-        <span class="btn-1">Edit Avatar</span>
+        <div>
+          <img src="../assets/img/photo-1.png" />
+        </div>
+        <label>
+          <input class="file" type="file" id="host_avatar" onchange="hostUploadAvatar(this)" />
+          <div class="btn-1">
+            <svg t="1605680328149" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5446" width="16" height="16"><path d="M883.6 926.7H140.4c-42.1 0-76.4-35.9-76.4-80V577.8c0-22.1 17.9-40 40-40s40 17.9 40 40v268.9h736V577.8c0-22.1 17.9-40 40-40s40 17.9 40 40v268.9c0 44.1-34.3 80-76.4 80z" fill="#000000" p-id="5447"></path><path d="M512 744.2c-22.1 0-40-17.9-40-40V104.6c0-22.1 17.9-40 40-40s40 17.9 40 40v599.6c0 22.1-17.9 40-40 40z" fill="#000000" p-id="5448"></path><path d="M320 335.9c-10.2 0-20.5-3.9-28.3-11.7-15.6-15.6-15.6-40.9 0-56.6L481.6 77.8c4.5-4.5 13.9-13.9 30.4-13.9 10.6 0 20.8 4.2 28.3 11.7l192 192c15.6 15.6 15.6 40.9 0 56.6s-40.9 15.6-56.6 0L512 160.5 348.3 324.2c-7.8 7.8-18.1 11.7-28.3 11.7z" fill="#000000" p-id="5449"></path></svg>
+            <span>&nbsp;Upload Avatar</span>
+          </div>
+        </label>
       </div>
       <div class="host-info-list">
         <div class="item">
-          <h3 class="title">Uid:</h3> <p class="content">1357924680123</p> <span class="btn-1">Edit</span>
+          <h3 class="title">Uid:</h3> <input disabled type="text" name="uid" class="content" value="1357924680123" /> <label>
+            <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
+          </label>
         </div>
         <div class="item">
-          <h3 class="title">Nickname:</h3> <p class="content">Eva</p> <span class="btn-1">Edit</span>
+          <h3 class="title">Nickname:</h3> <input disabled name="nickname" type="text" class="content" value="Eva" /> <label>
+            <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
+          </label>
         </div>
         <div class="item">
-          <h3 class="title">Age:</h3> <p class="content">25</p> <span class="btn-1">Edit</span>
+          <h3 class="title">Age:</h3> <input disabled type="number" name="age" class="content" value="25" /> <label>
+            <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
+          </label>
         </div>
         <div class="item">
-          <h3 class="title">Introduction:</h3> <p class="content">I like to make more friends. </p> <span class="btn-1">Edit</span>
+          <h3 class="title">Introduction:</h3> <input disabled type="text" name="introduction" class="content" value="I like to make more friends." /> <label>
+            <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
+          </label>
         </div>
       </div>
     </div>
@@ -46,18 +63,19 @@
   <section class="host-content-container">
     <div class="host-content-block-1 host-info-block-radios">
       <label>
-        <input checked type="radio" name="block-tag" value="0" /> <span class="title-1">Statistic</span>
+        <input onchange="toggleHostInfoBlock(this)" checked type="radio" name="block-tag" value="0" /> <span class="title-1">Statistic</span>
       </label>
       <label>
-        <input type="radio" name="block-tag" value="0" /> <span class="title-1">Gift Logs</span>
+        <input onchange="toggleHostInfoBlock(this)" type="radio" name="block-tag" value="1" /> <span class="title-1">Gift Logs</span>
       </label>
       <label>
-        <input type="radio" name="block-tag" value="0" /> <span class="title-1">Call Logs</span>
+        <input onchange="toggleHostInfoBlock(this)" type="radio" name="block-tag" value="2" /> <span class="title-1">Call Logs</span>
       </label>
     </div>
   </section>
 
   <section class="host-content-container host-info-content-block-container">
+    <!-- Statistic -->
     <div class="host-info-statistic-table">
       <div class="item">
         <h3 class="title">Total Calls</h3>
@@ -88,7 +106,67 @@
         <span class="content">20</span>
       </div>
     </div>
-    
+    <!-- Gift Logs -->
+    <div class="host-info-gift-logs-container">
+      <div class="host-info-gift-logs-header">
+        <div>
+          <h3 class="title">This Week Total:   </h3> <span class="content">1234</span>
+          <span><svg t="1605668905839" class="icon" viewBox="0 0 1130 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4550" width="15" height="15"><path d="M0 366.09337l545.725858 649.023967a25.824527 25.824527 0 0 0 38.980418 0L1129.944879 366.09337H0z" fill="#299ACC" p-id="4551"></path><path d="M978.895758 45.966684A64.804946 64.804946 0 0 0 907.756494 0.651947H252.398209a65.292201 65.292201 0 0 0-70.652008 42.878461L0 366.09337h1129.944879z" fill="#38B1E7" p-id="4552"></path><path d="M828.333892 21.603922a48.725523 48.725523 0 0 0-38.980419-18.028443L367.877699 0.651947a48.725523 48.725523 0 0 0-36.544142 18.028444 48.725523 48.725523 0 0 0-9.745105 40.929439l48.725523 306.970796h417.577733l48.725523-303.560009A48.725523 48.725523 0 0 0 828.333892 21.603922z" fill="#89D0EF" p-id="4553"></path><path d="M369.339465 366.09337l170.53933 638.304352a25.824527 25.824527 0 0 0 48.725523 0l194.902092-639.278862h-414.166945z" fill="#61C0EA" p-id="4554"></path></svg></span>
+        </div>
+        <div>
+          <h3 class="title">Last Week Total:   </h3> <span class="content">1234</span>
+          <span><svg t="1605668905839" class="icon" viewBox="0 0 1130 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4550" width="15" height="15"><path d="M0 366.09337l545.725858 649.023967a25.824527 25.824527 0 0 0 38.980418 0L1129.944879 366.09337H0z" fill="#299ACC" p-id="4551"></path><path d="M978.895758 45.966684A64.804946 64.804946 0 0 0 907.756494 0.651947H252.398209a65.292201 65.292201 0 0 0-70.652008 42.878461L0 366.09337h1129.944879z" fill="#38B1E7" p-id="4552"></path><path d="M828.333892 21.603922a48.725523 48.725523 0 0 0-38.980419-18.028443L367.877699 0.651947a48.725523 48.725523 0 0 0-36.544142 18.028444 48.725523 48.725523 0 0 0-9.745105 40.929439l48.725523 306.970796h417.577733l48.725523-303.560009A48.725523 48.725523 0 0 0 828.333892 21.603922z" fill="#89D0EF" p-id="4553"></path><path d="M369.339465 366.09337l170.53933 638.304352a25.824527 25.824527 0 0 0 48.725523 0l194.902092-639.278862h-414.166945z" fill="#61C0EA" p-id="4554"></path></svg></span>
+        </div>
+      </div>
+      <div class="host-info-gift-log-table">
+        <div class="item">
+          <h4 class="title">Candy x 6</h4>
+          <div class="content"> <img src="../assets/img/photo-2.png" /> </div>
+        </div>
+        <div class="item">
+          <h4 class="title">Perfume x 6</h4>
+          <div class="content"> <img src="../assets/img/photo-1.png" /> </div>
+        </div>
+        <div class="item">
+          <h4 class="title">Letter x 6</h4>
+          <div class="content"> <img src="../assets/img/facebook-icon.png" /> </div>
+        </div>
+        <div class="item">
+          <h4 class="title">Lipstick x 6</h4>
+          <div class="content"> <img src="../assets/img/photo-2.png" /> </div>
+        </div>
+      </div>
+    </div>
+    <!-- Call Logs -->
+    <div class="host-info-call-logs-container">
+      <div class="host-info-call-logs-header">
+        <div>
+          <h3 class="title">This Week Total:   </h3> <span class="content">1234</span>
+        </div>
+        <div>
+          <h3 class="title">Last Week Total:   </h3> <span class="content">9999</span>
+        </div>
+      </div>
+      <div class="host-info-call-log-table">
+        <h4 class="title">Status</h4>
+        <h4 class="title">Avatar</h4>
+        <h4 class="title">Nickname</h4>
+        <h4 class="title">Duration</h4>
+        <h4 class="title">Diamonds Recieved</h4>
+        <h4 class="title">Date</h4>
+        <!--  -->
+        <span style="display: none;"><svg class="icon" viewBox="0 0 1026 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3711" width="20" height="20"><path d="M1003.303907 809.923646L844.81501 651.410065c-31.569428-31.433672-83.847809-30.483381-116.515627 2.196778l-79.836839 79.84918c-5.047653-2.801509-10.268086-5.70175-15.760031-8.787112-50.427164-27.928701-119.452892-66.248902-192.082323-138.903017-72.814553-72.814553-111.171779-141.926672-139.186871-192.415543-2.974289-5.356189-5.800481-10.502574-8.639014-15.389788l53.586574-53.524867 26.398361-26.38602c32.717183-32.717183 33.630451-84.995564 2.110388-116.515626L216.400731 22.995786c-31.49538-31.483038-83.798444-30.532747-116.515627 2.196778l-44.676048 44.922877 1.234145 1.234145a257.553714 257.553714 0 0 0-36.802203 64.916026 268.710385 268.710385 0 0 0-16.389446 65.841634c-20.980465 173.508442 58.350374 332.071388 273.523551 547.269247 297.428939 297.428939 537.124575 274.942817 547.46671 273.832087a267.661362 267.661362 0 0 0 66.039098-16.586909 257.936299 257.936299 0 0 0 64.693879-36.641764l0.974975 0.85156 45.256096-44.318146c32.655476-32.717183 33.593426-84.995564 2.098046-116.589675z" p-id="3712" fill="#000000"></path><path d="M841.112575 110.237494l94.128237 94.671261-235.956178 236.005544 94.239311 94.362724-283.372028-0.111073V252.201191l94.510822 94.288676L841.112575 110.237494z" p-id="3713" fill="#000000"></path></svg></span>
+        <span><svg class="icon" viewBox="0 0 1026 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2834" width="20" height="20"><path d="M1003.269016 809.896692L844.787063 651.390065c-31.570553-31.434845-83.89205-30.472554-116.52359 2.195998l-79.845493 79.845493c-5.04586-2.788177-10.264439-5.687388-15.754434-8.783991-50.42159-27.88177-119.435138-66.225372-192.063447-138.915366-72.788691-72.788691-111.169304-141.950284-139.186781-192.458234-2.973233-5.354287-5.798421-10.498843-8.635947-15.384321l53.592216-53.530531 26.339637-26.376647c32.7179-32.7179 33.630843-84.990049 2.121975-116.523591L216.386257 23.001596c-31.49653-31.49653-83.793354-30.534239-116.52359 2.195998l-44.66018 44.919258 1.233706 1.233707a258.190122 258.190122 0 0 0-36.838479 64.905305 269.120763 269.120763 0 0 0-16.35895 65.793575c-20.923664 173.557848 58.304975 332.113823 273.525095 547.296932 297.409656 297.397319 537.106516 274.943858 547.444978 273.882871a267.3689 267.3689 0 0 0 66.040315-16.593354 257.289516 257.289516 0 0 0 64.695576-36.641087l0.974628 0.851258 45.252359-44.302405c32.643877-32.730237 33.593831-84.990049 2.097301-116.597613z" p-id="2835" fill="#000000"></path><path d="M576.67794 547.006148l-100.941876-103.767064 253.057902-258.683605-101.077583-103.409289 303.923627 0.111033v310.153845l-101.361337-103.35994-253.600733 258.95502z" p-id="2836" fill="#000000"></path></svg></span>
+        <div><img class="avatar" src="../assets/img/photo-2.png" /></div>
+        <span>Diva</span>
+        <span>3mins</span>
+        <div>
+          <span>500</span>
+          <svg t="1605668905839" class="icon" viewBox="0 0 1130 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4550" width="15" height="15"><path d="M0 366.09337l545.725858 649.023967a25.824527 25.824527 0 0 0 38.980418 0L1129.944879 366.09337H0z" fill="#299ACC" p-id="4551"></path><path d="M978.895758 45.966684A64.804946 64.804946 0 0 0 907.756494 0.651947H252.398209a65.292201 65.292201 0 0 0-70.652008 42.878461L0 366.09337h1129.944879z" fill="#38B1E7" p-id="4552"></path><path d="M828.333892 21.603922a48.725523 48.725523 0 0 0-38.980419-18.028443L367.877699 0.651947a48.725523 48.725523 0 0 0-36.544142 18.028444 48.725523 48.725523 0 0 0-9.745105 40.929439l48.725523 306.970796h417.577733l48.725523-303.560009A48.725523 48.725523 0 0 0 828.333892 21.603922z" fill="#89D0EF" p-id="4553"></path><path d="M369.339465 366.09337l170.53933 638.304352a25.824527 25.824527 0 0 0 48.725523 0l194.902092-639.278862h-414.166945z" fill="#61C0EA" p-id="4554"></path></svg>
+        </div>
+        <span>11-22-2020 22:30</span>
+      </div>
+    </div>
   </section>
 
   <section class="host-content-container">
@@ -143,5 +221,11 @@
     </div>
   </div>
 </body>
-<script src="../assets/js/index.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/8.0.2/firebase-app.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/8.0.2/firebase-analytics.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/7.23.0/firebase-auth.js"></script>
+<script defer src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script defer src="../assets/js/md5.js"></script>
+<script defer src="../assets/js/index.js"></script>
 </html>
