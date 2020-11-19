@@ -25,7 +25,7 @@
     <div class="host-content-block-1 host-info-container">
       <div class="host-info-avatar">
         <div>
-          <img src="../assets/img/photo-1.png" />
+          <img class="avatar" src="../assets/img/photo-1.png" />
         </div>
         <label>
           <input class="file" type="file" id="host_avatar" onchange="hostUploadAvatar(this)" />
@@ -37,22 +37,20 @@
       </div>
       <div class="host-info-list">
         <div class="item">
-          <h3 class="title">Uid:</h3> <input disabled type="text" name="uid" class="content" value="1357924680123" /> <label>
+          <h3 class="title">Uid:</h3> <span class="content uid">1357924680123</span>
+        </div>
+        <div class="item">
+          <h3 class="title">Nickname:</h3> <input disabled name="nickname" type="text" class="content" placeholder="nickname" /> <label>
             <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
           </label>
         </div>
         <div class="item">
-          <h3 class="title">Nickname:</h3> <input disabled name="nickname" type="text" class="content" value="Eva" /> <label>
+          <h3 class="title">Age:</h3> <input disabled type="number" name="age" class="content" placeholder="age" /> <label>
             <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
           </label>
         </div>
         <div class="item">
-          <h3 class="title">Age:</h3> <input disabled type="number" name="age" class="content" value="25" /> <label>
-            <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
-          </label>
-        </div>
-        <div class="item">
-          <h3 class="title">Introduction:</h3> <input disabled type="text" name="introduction" class="content" value="I like to make more friends." /> <label>
+          <h3 class="title">Introduction:</h3> <input disabled type="text" name="introduction" class="content" placeholder="introduction"/> <label>
             <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
           </label>
         </div>

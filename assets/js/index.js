@@ -149,7 +149,36 @@ firebase.auth().onAuthStateChanged(function (user) {
         // ...
     }
 });
-
+/**
+ * await or callback
+ * @param {String} relateUid - other host uid
+ * @param {Function} call - callback
+ */
+async function getHostInfo(relateUid, call){
+    let url = getUrl("/api/user/info");
+    let dataObj = relateUid ? { relateUid: relateUid} : {};
+    let resultObj = { success: false};
+    await axios.post(url, dataObj, { headers: getHeaders()}).then(res => {
+        if(res.data.status === 0){
+            resultObj.success = true;
+            resultObj.data = res.data.data;
+        }else throw res.data.msg;
+    }).catch(error => {
+        resultObj.error = error;
+        console.error("Get Host Info => ", error);
+    });
+    if(typeof call === "function") call(resultObj);
+    return resultObj;
+}
+/**
+ * await or callback
+ * @param {Function} call - callback
+ */
+async function getSelfInfo(call){
+    let resultObj = await getHostInfo();
+    if(typeof call === "function") call(resultObj);
+    return resultObj;
+}
 /* ------------------------------------ Login Page ------------------------------------ */
 var loginConfig = {
     inLogin: false
@@ -202,14 +231,21 @@ function logout() {
     });
 }
 /* ------------------------------------ Apply Page ------------------------------------ */
-
-function initApplyPage() {
-    console.log("Init ApplyPage");
+var applyViews = {
+    applyAgent: document.querySelector(".role-items .apply-agent"),
+    applyHost: document.querySelector(".role-items .apply-host"),
+    
 }
 
 var applyConfig = {
     upImgs: new Array()
 }
+
+function initApplyPage() {
+    console.log("Init ApplyPage");
+    
+}
+
 
 var applyViews = {
     imageList: document.querySelector(".image-list")
@@ -228,6 +264,15 @@ function chooseImage(ele) {
     newImg.src = URL.createObjectURL(file);
     applyViews.imageList.insertBefore(newImg, ele.parentElement);
 }
+
+var submitApply = (() => {
+    var inSubmit = false;
+    return function(){
+        if(inSubmit) return;
+        let url = getUrl("/api/apply/agent");
+        
+    }
+})();
 
 /* ------------------------------------ Agent Page ------------------------------------ */
 var agentConfig = {
@@ -316,9 +361,16 @@ function renderAgentHostList(arr){
     arr.forEach(value => {
         itemNode = document.createElement("div");
         itemNode.setAttribute("class", "agent-host-item");
-        itemNode.innerHTML = `<div class="uid">${value.uid}</div><div class="nickname">${value.nickname}</div><div class="avatar"><img src="${value.avatar}"></div><div class="other-info">${value.otherInfo || "No Other Info"}</div><div class="time-of-calls">${value.calls}</div><div class="work-hours">${value.minutes / 60}</div><div class="status">Invalid</div><div class="manage"><span onclick="agentDeleteHost(this)" class="delete manage-option">Delete</span><label class="freeze"><input onchange="agentFreezeHost(this)" type="checkbox" class="agent-freeze-host" /><span class="manage-option">Freeze</span></label></div>`;
+        itemNode.innerHTML = `<div class="uid">${value.uid}</div><div class="nickname">${value.nickname}</div><div class="avatar"><img src="${value.avatar}"></div><div class="other-info">${value.otherInfo || "No Other Info"}</div><div class="time-of-calls">${value.calls}</div><div class="work-hours">${(value.minutes / 60).toFixed(2)}</div><div class="status">Invalid</div><div class="manage"><span onclick="agentDeleteHost(this)" class="delete manage-option">Delete</span><label class="freeze"><input onchange="agentFreezeHost(this)" type="checkbox" class="agent-freeze-host" /><span class="manage-option">Freeze</span></label></div>`;
         listNode.appendChild(itemNode);
     });
+}
+
+function renderAgentSelfInfo(obj){
+    if(!obj.success) return;
+    let data = obj.data;
+    document.querySelector(".agent-info-container .uid").innerText = data.uid;
+    document.querySelector(".agent-info-container .status").innerText = data.status;
 }
 
 function agentGetHostList(){
@@ -342,20 +394,43 @@ function initAgentPage() {
             });
         }
     });
+    getSelfInfo(renderAgentSelfInfo);
     agentGetHostList();
 }
 
 /* ------------------------------------ Host Page ------------------------------------ */
-var hostViews = {
+var hostViews = {}
 
+function renderHostSelfInfo(obj){
+    if(!obj.success) return;
+    let data = obj.data;
+    hostViews.hostSelf.avatarImg.src = data.avatar || "../assets/img/photo-2.png";
+    hostViews.hostSelf.uid.innerText = data.uid;
+    if(data.nickname) hostViews.hostSelf.nickname.value = data.nickname;
+    else hostViews.hostSelf.nickname.setAttribute("placeholder", "No Set NickName");
+    hostViews.hostSelf.age.value = data.age || 0;
+    if(data.introduction) hostViews.hostSelf.introduction.value = data.introduction;
+    else hostViews.hostSelf.introduction.setAttribute("placeholder", "No Set Introduction");
 }
 
-function initHostPage() {
-    console.log("Init HostPage");
+function initHostPageViews(){
     hostViews = {}
     hostViews.statisticBlock = document.querySelector(".host-info-content-block-container > .host-info-statistic-table");
     hostViews.giftLogs = document.querySelector(".host-info-content-block-container > .host-info-gift-logs-container");
     hostViews.callLogs = document.querySelector(".host-info-content-block-container > .host-info-call-logs-container");
+    hostViews.hostSelf = {};
+    hostViews.hostSelf.avatarImg = document.querySelector(".host-info-avatar img.avatar");
+    let hostInfoList = document.querySelector(".host-info-list");
+    hostViews.hostSelf.uid = hostInfoList.querySelector(".uid");
+    hostViews.hostSelf.nickname = hostInfoList.querySelector("input[name=nickname]");
+    hostViews.hostSelf.age = hostInfoList.querySelector("input[name=age]");
+    hostViews.hostSelf.introduction = hostInfoList.querySelector("input[name=introduction]");
+}
+
+async function initHostPage() {
+    console.log("Init HostPage");
+    initHostPageViews();
+    getSelfInfo(renderHostSelfInfo)
 }
 
 function toggleHostInfoBlock(ele) {
@@ -366,9 +441,42 @@ function toggleHostInfoBlock(ele) {
     }
 }
 
+async function uploadFile(file, type){
+    let resultObj = { success: false};
+    let url = getUrl("/api/user/upload");
+    let form = new FormData();
+    form.append("filename", file);
+    form.append("type", type);
+    await axios.post(url, form, { headers: getHeaders()}).then(res => {
+        if(res.data.status === 0){
+            resultObj.success = true;
+            resultObj.data = res.data.data;
+        }else throw res.data.msg;
+    }).catch(error => {
+        resultObj.error = error;
+    });
+    return resultObj;
+}
+
 async function uploadCustomAvatar(avatar) {
-    await sleep(3);
-    return { status: 0, msg: "success" }
+    let url = getUrl("/api2/setProfile");
+    let resultObj = { success: false }
+    let upfileResult = await uploadFile(avatar, 3);
+    if(!upfileResult.success){
+        resultObj.error = upfileResult.error;
+        return resultObj;
+    }
+    let form = new FormData();
+    form.append("avatar", upfileResult.data);
+    await axios.post(url, form, {headers: getHeaders()}).then(res => {
+        if(res.data.status === 0){
+            resultObj.success = true;
+            resultObj.data = res.data.data;
+        }else throw res.data.error;
+    }).catch(error => {
+        resultObj.error = error;
+    });
+    return resultObj;
 }
 
 var hostUploadAvatar = (() => {
