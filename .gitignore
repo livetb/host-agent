@@ -3,3 +3,5 @@
 
 # dir
 test/
+*.mp4
+video/

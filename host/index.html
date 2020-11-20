@@ -27,7 +27,7 @@
         <div>
           <img class="avatar" src="../assets/img/photo-1.png" />
         </div>
-        <label>
+        <label class="only-host-self-view">
           <input class="file" type="file" id="host_avatar" onchange="hostUploadAvatar(this)" />
           <div class="btn-1">
             <svg t="1605680328149" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5446" width="16" height="16"><path d="M883.6 926.7H140.4c-42.1 0-76.4-35.9-76.4-80V577.8c0-22.1 17.9-40 40-40s40 17.9 40 40v268.9h736V577.8c0-22.1 17.9-40 40-40s40 17.9 40 40v268.9c0 44.1-34.3 80-76.4 80z" fill="#000000" p-id="5447"></path><path d="M512 744.2c-22.1 0-40-17.9-40-40V104.6c0-22.1 17.9-40 40-40s40 17.9 40 40v599.6c0 22.1-17.9 40-40 40z" fill="#000000" p-id="5448"></path><path d="M320 335.9c-10.2 0-20.5-3.9-28.3-11.7-15.6-15.6-15.6-40.9 0-56.6L481.6 77.8c4.5-4.5 13.9-13.9 30.4-13.9 10.6 0 20.8 4.2 28.3 11.7l192 192c15.6 15.6 15.6 40.9 0 56.6s-40.9 15.6-56.6 0L512 160.5 348.3 324.2c-7.8 7.8-18.1 11.7-28.3 11.7z" fill="#000000" p-id="5449"></path></svg>
@@ -36,21 +36,24 @@
         </label>
       </div>
       <div class="host-info-list">
-        <div class="item">
-          <h3 class="title">Uid:</h3> <span class="content uid">1357924680123</span>
+        <div class="items">
+          <div class="item">
+            <h3 class="title">Uid:</h3> <span class="content uid">1357924680123</span>
+          </div>
+          <div class="item">
+            <h3 class="title">Nickname:</h3> <input disabled name="nickname" type="text" class="content"
+              placeholder="nickname" />
+          </div>
+          <div class="item">
+            <h3 class="title">Age:</h3> <input disabled type="number" name="age" class="content" placeholder="age" />
+          </div>
+          <div class="item">
+            <h3 class="title">Introduction:</h3> <input disabled type="text" name="remark" class="content"
+              placeholder="introduction" />
+          </div>
         </div>
-        <div class="item">
-          <h3 class="title">Nickname:</h3> <input disabled name="nickname" type="text" class="content" placeholder="nickname" /> <label>
-            <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
-          </label>
-        </div>
-        <div class="item">
-          <h3 class="title">Age:</h3> <input disabled type="number" name="age" class="content" placeholder="age" /> <label>
-            <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
-          </label>
-        </div>
-        <div class="item">
-          <h3 class="title">Introduction:</h3> <input disabled type="text" name="introduction" class="content" placeholder="introduction"/> <label>
+        <div>
+          <label class="only-host-self-view">
             <input onchange="saveHostProfile(this)" type="checkbox" /> <span></span>
           </label>
         </div>
@@ -171,43 +174,46 @@
     <div class="host-content-block-1">
       <div class="host-upload-container">
         <h1 class="title-1">All Upload</h1>
-        <span class="upload-btn">Upload</span>
+        <label class="only-host-self-view">
+          <input type="file" class="file" onchange="hostUploadMediaFile(this)" />
+          <span class="upload-btn">Upload</span>
+        </label>
       </div>
     </div>
 
     <div class="host-all-upload-list">
-      <div file-id="13579" class="host-already-upload-item">
+      <!-- <div file-id="13579" class="host-already-upload-item">
         <img src="../assets/img/photo-1.png" />
-        <div class="manage">
+        <div class="manage only-host-self-view">
           <label class="item"> <input type="checkbox" name="host-file-tag" value="Home" /> <span class="btn-2">Home</span> </label>
-          <label class="item"> <input type="checkbox" name="host-file-tag" value="Home" /> <span class="btn-2">Moments</span> </label>
-          <label class="item"> <input type="checkbox" name="host-file-tag" value="Home" /> <span class="btn-2">Other</span> </label>
+          <label class="item"> <input type="checkbox" name="host-file-tag" value="Moments" /> <span class="btn-2">Moments</span> </label>
+          <label class="item"> <input type="checkbox" name="host-file-tag" value="Other" /> <span class="btn-2">Other</span> </label>
           <label class="item">  </label>
-          <div class="item"> <span onclick="alert('Delete')" class="btn-2 delete">Delete</span> </div>
-          <label class="item"> <input type="checkbox" name="host-file-tag" value="Home" /> <span class="btn-2 hide">Hide</span> </label>
+          <div class="item"> <span class="btn-2 delete">Delete</span> </div>
+          <label class="item"> <input type="checkbox" name="host-file-tag" value="Hide" /> <span class="btn-2 hide">Hide</span> </label>
         </div>
       </div>
 
       <div file-id="13581" class="host-already-upload-item">
         <div class="host-video">
-          <video>
-            <img src="../assets/img/photo-2.png" />
-            <source src="" >
+          <video preload="metadata">
+            <source src="../assets/video/flower.webm" >
+            Sorry, your browser doesn't support embedded videos.
           </video>
           <div class="video-play">
-            <div onclick="alert('Play Video')">
+            <div onclick="playHostVideo(this)">
               <svg t="1605615685955" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4900" width="32" height="32"><path d="M512 1024A512 512 0 1 1 512 0a512 512 0 0 1 0 1024zM383.232 287.616v448l384-223.104-384-224.896z" fill="#FFFFFF" p-id="4901"></path></svg>            </div>
           </div>
         </div>
-        <div class="manage">
+        <div class="manage only-host-self-view">
           <label class="item"> <input type="checkbox" name="host-file-tag" value="Home" /> <span class="btn-2">Home</span> </label>
-          <label class="item"> <input type="checkbox" name="host-file-tag" value="Home" /> <span class="btn-2">Moments</span> </label>
-          <label class="item"> <input type="checkbox" name="host-file-tag" value="Home" /> <span class="btn-2">Other</span> </label>
+          <label class="item"> <input type="checkbox" name="host-file-tag" value="Moments" /> <span class="btn-2">Moments</span> </label>
+          <label class="item"> <input type="checkbox" name="host-file-tag" value="Other" /> <span class="btn-2">Other</span> </label>
           <label class="item">  </label>
-          <div class="item"> <span onclick="alert('Delete')" class="btn-2 delete">Delete</span> </div>
-          <label class="item"> <input type="checkbox" name="host-file-tag" value="Home" /> <span class="btn-2 hide">Hide</span> </label>
+          <div class="item"> <span class="btn-2 delete">Delete</span> </div>
+          <label class="item"> <input type="checkbox" name="host-file-tag" value="Hide" /> <span class="btn-2 hide">Hide</span> </label>
         </div>
-      </div>
+      </div> -->
     </div>
   </section>
 
