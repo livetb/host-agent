@@ -641,9 +641,10 @@ input.create-new-host:checked + span::before {
     margin-right: 10px;
 }
 .dialog-create-new-host .submit {
-    width: 100px;
+    min-width: 100px;
     margin: 34px auto 0 auto;
     line-height: 38px;
+    padding: 0 20px;
     text-align: center;
     background: #1E3B77;
     border-radius: 27px;
@@ -978,6 +979,18 @@ input.create-new-host:checked + span::before {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+.host-info-call-log-table .chat-info {
+    flex-direction: column;
+    align-items: flex-start
+}
+.host-info-call-log-table .chat-info * {
+    font-size: 14px;
+    line-height: 16px;
+    color: #000;
+}
+.host-info-call-log-table .chat-info .title-1 {
+    opacity: 0.6;
 }
 .host-info-call-log-table > .title {
     font-size: 16px;

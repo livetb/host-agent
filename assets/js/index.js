@@ -112,6 +112,23 @@ function showView(ele, displayName) {
     ele.style.display = displayName;
     return true;
 }
+/**
+ * -1 & 0: failed ; 1: success
+ * @param {HTMLElement} ele
+ * @param {Boolean} isDisabled - true: add disabled / false: remove disabled
+ */
+function disabledView(ele, isDisabled){
+    if(!ele) return -1;
+    if(ele.classList.contains("disabled") && isDisabled) return 0;
+    if(isDisabled){
+        ele.setAttribute("disabled", "true");
+        ele.classList.add("disabled");
+    }else {
+        ele.removeAttribute("disabled");
+        ele.classList.remove("disabled");
+    }
+    return 1;
+}
 
 function dialog(show, cssSelector) {
     let dialog = document.querySelector(cssSelector);
@@ -384,14 +401,12 @@ var submitApply = (() => {
 /* ------------------------------------ Agent Page ------------------------------------ */
 var agentConfig = {
     uploadHostAvatar: null,
-    addHostUid: null,
-    addHostFromExists: true
+    addHostUid: null
 }
 var agentViews = {
 }
 
 function changeAddHostMethod(isChecked) {
-    agentConfig.addHostFromExists = isChecked;
     console.log(isChecked);
     let nickname = document.querySelector(".agent-upload-host-info-container .host-nickname");
     let avatar = document.querySelector(".agent-upload-host-info-container .host-avatar");
@@ -402,6 +417,74 @@ function changeAddHostMethod(isChecked) {
     else {
         nickname.removeAttribute("disabled");
         avatar.removeAttribute("disabled");
+    }
+}
+
+function showTips(tipsId, msg){
+    let tips = document.querySelector(`.tips[tips-id=${tipsId}]`);
+    if(tips) tips.innerText = msg;
+}
+
+var agentInputNewHostUid = null;
+var createAgentInputNewHostUid = () => {
+    var timeOut = null;
+    // 
+    let container = document.querySelector(".dialog-create-new-host");
+    let submitBtn = container.querySelector('.submit');
+    let uid = container.querySelector("input[name=uid]");
+    let nickname = container.querySelector("input[name=nickname]");
+    let avatarTitle = container.querySelector(".title.avatar");
+    let avatar = container.querySelector("input[name=avatar]");
+    let avatarLabel = container.querySelector("label.avatar");
+    let previewTitle = container.querySelector(".title.show-avatar");
+    let preview = container.querySelector("img.show-avatar");
+    let existsHide = [avatarLabel, avatarTitle]
+    let preViews = [preview, previewTitle];
+    let notUid = document.querySelectorAll(".agent-upload-host-info-container > *:not(.uid)");
+    notUid.forEach(element => showView(element, "none"));
+    //
+    var addExistsHost = function(result){
+        agentConfig.addNewHostType = 1;
+        notUid.forEach(element => {
+            if(existsHide.indexOf(element) >= 0) showView(element, "none");
+            else showView(element, "inline-block");
+        });
+        uid.value = result.data.uid;
+        nickname.value = result.data.nickname;
+        preview.src = result.data.avatar;
+        disabledView(nickname, true);
+        submitBtn.innerText = "Add";
+    }
+    var createNewHost = function(result){
+        agentConfig.addNewHostType = 0;
+        showTips("add-host-tips", result.error);
+        notUid.forEach(element => {
+            if(preViews.indexOf(element) >= 0) showView(element, "none");
+            else showView(element, "inline-block");
+        });
+        nickname.value = "";
+        showView(avatarLabel, "flex");
+        disabledView(nickname, false);
+        submitBtn.innerText = "Create New Host";
+    }
+    return async function(ele){
+        if(timeOut) clearTimeout(timeOut);
+        timeOut = setTimeout(async () => {
+            let newHostUid = ele.value;
+            console.log("New Host UID: ", newHostUid);
+            if(newHostUid.length < 16) {
+                showTips("add-host-tips", "uid length = 16");
+                agentConfig.addNewHostType = -1;
+                notUid.forEach(element => showView(element, "none"));
+                return;
+            }
+            let result = await getHostInfo(newHostUid);
+            if(!result.success){
+                createNewHost(result);
+                return;
+            }
+            addExistsHost(result);
+        }, 500);
     }
 }
 
@@ -420,18 +503,24 @@ function agentUploadHostAvatar(ele) {
     showView(preview, "inline-block");
 }
 
-function agentUploadHostInfo(ele) {
+async function agentUploadHostInfo(ele) {
+    if(!agentConfig.addNewHostType || agentConfig.addNewHostType !== 1){
+        alert("Only support add exists host");
+        return;
+    }
     let parent = parentByClass(ele, "dialog");
     let inputs = parent.querySelectorAll("input:not(.no-text)");
     let form = new FormData();
     form.append("avatar", agentConfig.uploadHostAvatar);
+    let dataObj = {}
     let hasEmpty = false;
     for (let i = 0; i < inputs.length; i++) {
         let value = inputs[i].value;
         if (value.trim() === "") hasEmpty = true;
         form.append(inputs[i].name, value);
+        dataObj[inputs[i].name] = value;
     }
-    if (agentConfig.addHostFromExists) {
+    if (agentConfig.addNewHostType === 0) {
         if (!agentConfig.uploadHostAvatar) {
             alert("Please upload a avatar");
             return;
@@ -441,9 +530,18 @@ function agentUploadHostInfo(ele) {
             return;
         }
     }
-
     form.forEach((v, k) => {
         console.log(`${k} => ${v}`);
+    });
+    let url = getUrl("/api/agent/addHost");
+    let result = null;
+    await axios.post(url, {relateUid: dataObj.uid, code: ""}, { headers: getHeaders()}).then(res => {
+        if(res.data.status === 0){
+            alert("Success");
+        }else throw res.data.msg;
+    }).catch(error => {
+        console.error(error);
+        alert("failed");
     });
 }
 
@@ -507,6 +605,7 @@ async function initAgentPage() {
     });
     await getSelfInfo(renderAgentSelfInfo);
     agentGetHostList();
+    agentInputNewHostUid = createAgentInputNewHostUid();
 }
 
 /* ------------------------------------ Host Page ------------------------------------ */
@@ -545,6 +644,46 @@ function initHostPageViews(){
     hostViews.hostSelf.remark = hostInfoList.querySelector("input[name=remark]");
 }
 
+
+function renderHostStatisticLogs(obj){
+    console.log("RenderHostStatisticLogs => ", obj);
+}
+function renderHostGiftLogs(obj){
+    console.log("renderHostGiftLogs => ", obj);
+}
+function renderHostCallLogs(obj){
+    console.log("renderHostCallLogs => ", obj);
+    if(obj.status !== 0) return;
+    let data = obj.data;
+    let defaultValue = 666;
+    document.querySelector(".host-info-call-logs-header .total").innerText = data.total || defaultValue;
+    document.querySelector(".host-info-call-logs-header .last-week-total").innerText = data.lastWeeklyCallNums || defaultValue;
+    let records = data.records;
+    if(!records || records.length < 1) records = [{},{},{}];
+    let callLogTable = document.querySelector(".host-info-call-logs-container .host-info-call-log-table");
+    let logHTML = new Array();
+    records.forEach(value => {
+        let item = `
+        <span class="chat-type" style="display: ${value.chatType === "answer" ? "flex" : "none"};"><svg class="icon" viewBox="0 0 1026 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3711" width="20" height="20"><path d="M1003.303907 809.923646L844.81501 651.410065c-31.569428-31.433672-83.847809-30.483381-116.515627 2.196778l-79.836839 79.84918c-5.047653-2.801509-10.268086-5.70175-15.760031-8.787112-50.427164-27.928701-119.452892-66.248902-192.082323-138.903017-72.814553-72.814553-111.171779-141.926672-139.186871-192.415543-2.974289-5.356189-5.800481-10.502574-8.639014-15.389788l53.586574-53.524867 26.398361-26.38602c32.717183-32.717183 33.630451-84.995564 2.110388-116.515626L216.400731 22.995786c-31.49538-31.483038-83.798444-30.532747-116.515627 2.196778l-44.676048 44.922877 1.234145 1.234145a257.553714 257.553714 0 0 0-36.802203 64.916026 268.710385 268.710385 0 0 0-16.389446 65.841634c-20.980465 173.508442 58.350374 332.071388 273.523551 547.269247 297.428939 297.428939 537.124575 274.942817 547.46671 273.832087a267.661362 267.661362 0 0 0 66.039098-16.586909 257.936299 257.936299 0 0 0 64.693879-36.641764l0.974975 0.85156 45.256096-44.318146c32.655476-32.717183 33.593426-84.995564 2.098046-116.589675z" p-id="3712" fill="#000000"></path><path d="M841.112575 110.237494l94.128237 94.671261-235.956178 236.005544 94.239311 94.362724-283.372028-0.111073V252.201191l94.510822 94.288676L841.112575 110.237494z" p-id="3713" fill="#000000"></path></svg></span>
+        <span class="chat-type" style="display: ${value.chatType !== "answer" ? "flex" : "none"};"><svg class="icon" viewBox="0 0 1026 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2834" width="20" height="20"><path d="M1003.269016 809.896692L844.787063 651.390065c-31.570553-31.434845-83.89205-30.472554-116.52359 2.195998l-79.845493 79.845493c-5.04586-2.788177-10.264439-5.687388-15.754434-8.783991-50.42159-27.88177-119.435138-66.225372-192.063447-138.915366-72.788691-72.788691-111.169304-141.950284-139.186781-192.458234-2.973233-5.354287-5.798421-10.498843-8.635947-15.384321l53.592216-53.530531 26.339637-26.376647c32.7179-32.7179 33.630843-84.990049 2.121975-116.523591L216.386257 23.001596c-31.49653-31.49653-83.793354-30.534239-116.52359 2.195998l-44.66018 44.919258 1.233706 1.233707a258.190122 258.190122 0 0 0-36.838479 64.905305 269.120763 269.120763 0 0 0-16.35895 65.793575c-20.923664 173.557848 58.304975 332.113823 273.525095 547.296932 297.409656 297.397319 537.106516 274.943858 547.444978 273.882871a267.3689 267.3689 0 0 0 66.040315-16.593354 257.289516 257.289516 0 0 0 64.695576-36.641087l0.974628 0.851258 45.252359-44.302405c32.643877-32.730237 33.593831-84.990049 2.097301-116.597613z" p-id="2835" fill="#000000"></path><path d="M576.67794 547.006148l-100.941876-103.767064 253.057902-258.683605-101.077583-103.409289 303.923627 0.111033v310.153845l-101.361337-103.35994-253.600733 258.95502z" p-id="2836" fill="#000000"></path></svg></span>
+        <div><img class="avatar" src="${value.avatar ? value.avatar : "../assets/img/photo-2.png"}" /></div>
+        <span class="host-name">${value.nickname ? value.nickname : "Nickname"}</span>
+        <span class="chat-duration">${value.seconds ? (+value.seconds).toFixed(0) : 2}mins</span>
+        <div class="chat-info">
+          <div><span class="title-1">RoomId: </span><span class="content-1 room-id">${value.roomId ? value.roomId : "000000000000000"}</span></div>
+          <div><span class="title-1">UserUid: </span><span class="content-1 user-uid">${value.userUid ? value.userUid : "111111111111111"}</span></div>
+          <div><span class="title-1">Date: </span><span class="content-1 chat-datetime">${value.dateTime ? value.dateTime : "1970-01-01 00:00"}</span></div>
+        </div>
+        <div>
+          <span class="diamond">${value.diamond ? value.diamond : "000"}</span>
+          <svg t="1605668905839" class="icon" viewBox="0 0 1130 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4550" width="15" height="15"><path d="M0 366.09337l545.725858 649.023967a25.824527 25.824527 0 0 0 38.980418 0L1129.944879 366.09337H0z" fill="#299ACC" p-id="4551"></path><path d="M978.895758 45.966684A64.804946 64.804946 0 0 0 907.756494 0.651947H252.398209a65.292201 65.292201 0 0 0-70.652008 42.878461L0 366.09337h1129.944879z" fill="#38B1E7" p-id="4552"></path><path d="M828.333892 21.603922a48.725523 48.725523 0 0 0-38.980419-18.028443L367.877699 0.651947a48.725523 48.725523 0 0 0-36.544142 18.028444 48.725523 48.725523 0 0 0-9.745105 40.929439l48.725523 306.970796h417.577733l48.725523-303.560009A48.725523 48.725523 0 0 0 828.333892 21.603922z" fill="#89D0EF" p-id="4553"></path><path d="M369.339465 366.09337l170.53933 638.304352a25.824527 25.824527 0 0 0 48.725523 0l194.902092-639.278862h-414.166945z" fill="#61C0EA" p-id="4554"></path></svg>
+        </div>
+        `;
+        logHTML.push(item);
+    })
+    callLogTable.innerHTML += logHTML.join("");
+}
+
 async function initHostLogs(){
     let url1 = getUrl("/api/call/weekly/total");
     let url2 = getUrl("/api/reward/weekly/list");
@@ -553,7 +692,12 @@ async function initHostLogs(){
     let giftLog = axios.post(url2, {}, { headers: getHeaders()});
     let VideoCallList = axios.post(url3, {}, { headers: getHeaders()});
     Promise.allSettled([VideoCallToal, giftLog, VideoCallList]).then(results => {
-        results.forEach(result => console.log(result));
+        if(results[0].status === "fulfilled") renderHostStatisticLogs(results[0].value.data);
+        else console.error(results[0].reason);
+        if(results[1].status === "fulfilled") renderHostGiftLogs(results[1].value.data);
+        else console.error(results[1].reason);
+        if(results[2].status === "fulfilled") renderHostCallLogs(results[2].value.data);
+        else console.error(results[2].reason);
     }).catch(error => console.error(error));
 }
 
@@ -586,7 +730,7 @@ async function initHostPage() {
     initHostPageViews();
     if(!config.relateUid) getSelfInfo(renderHostInfo);
     else getHostInfo(config.relateUid, renderHostInfo);
-    // initHostLogs();
+    initHostLogs();
     initHostMediaList();
 }
 
