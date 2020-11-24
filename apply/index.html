@@ -1,32 +1,38 @@
-
 <!DOCTYPE html>
 <html>
 
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="user-scalable=no, initial-scale=1.0, width=device-width, maximum-scale=1.0, minimal-ui">
+  <meta name="viewport"
+    content="user-scalable=no, initial-scale=1.0, width=device-width, maximum-scale=1.0, minimal-ui">
   <title>Home</title>
   <link rel="stylesheet" href="../assets/css/index.css" />
   <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
 </head>
 
-<body>
+<body class="apply-page">
   <div class="auto-margin">
     <h1 class="header-title">Apply to be an </h1>
     <div class="content-block-1 role-items">
       <label class="role-label">
-        <input class="role apply-agent" checked name="role" value="agent" type="radio" /> <span>Agent</span>
+        <input onchange="changeApplyType(this)" class="role apply-agent" checked name="role" value="agent" type="radio" /> <span>Agent</span>
       </label>
       <label class="role-label">
-        <input class="role apply-host" name="role" value="host" type="radio" /> <span>Host</span>
+        <input onchange="changeApplyType(this)" class="role apply-host" name="role" value="host" type="radio" /> <span>Host</span>
       </label>
     </div>
   </div>
 
   <div class="auto-margin">
-    <!-- <h2 class="content-block-title">What to Apply</h2> -->
-    <div class="content-block-1 apply-info">
+    <div class="apply-tips">
+      <p>The host is one person who will have 1 to 1 video calls with users.</p>
+      <p>The agent is an organization that unite many hosts together to work for.</p>
+    </div>
+  </div>
+
+  <div class="auto-margin">
+    <div class="apply-info">
       <input class="input-gray contact-info" name="phone" type="text" placeholder="Phone Number" />
       <input class="input-gray contact-info" name="email" type="text" placeholder="Email Adress" />
       <textarea class="input-gray contact-info" name="reason" type="text" placeholder="Why to apply……"></textarea>
@@ -36,15 +42,15 @@
   <div class="auto-margin">
     <h2 class="content-block-title">Upload Your Photo (at least 1 photo)</h2>
     <div class="image-list content-block-1">
-        <img src="../assets/img/photo-1.png" />
-        <img src="../assets/img/photo-2.png" />
-        <label class="upload-image">
-            <input id="uploadImage" class="input-file" type="file" onchange="chooseImage(this)" /> <span>+</span>
-        </label>
+      <img src="../assets/img/photo-1.png" />
+      <img src="../assets/img/photo-2.png" />
+      <label class="upload-image">
+        <input id="uploadImage" class="input-file" type="file" onchange="chooseImage(this)" /> <span>+</span>
+      </label>
     </div>
   </div>
 
-  <div class="auto-margin">
+  <div class="auto-margin only-host-view">
     <h2 class="content-block-title">Social Media Link</h2>
     <div class="social-items">
       <div class="social-icon icon_facebook-icon"></div>
@@ -61,6 +67,34 @@
   <div class="auto-margin">
     <div class="content-block-1 submit-info" onclick="submitApply()">Submit</div>
   </div>
+
+  <!-- Modal -->
+  <div class="modal" id="dialog-modal">
+    <div id="dialog_1" class="dialog dialog-login" style="z-index: 1;" uncancellable="false">
+        <div class="login-and-signup">
+          <h1 class="login-and-signup-title">Login / Signup to your <i>LiveHub</i></h1>
+    
+          <div class="login-and-signup-lists">
+            <div class="login-and-signup-item" onclick="loginByOther('Google')">
+              <img class="login-and-signup-icon" src="../assets/img/google-login.png">
+              <span class="login-and-signup-text">Google</span>
+            </div>
+            <div class="login-and-signup-item" onclick="loginByOther('Facebook')">
+              <img class="login-and-signup-icon" src="../assets/img/facebook-login.png">
+              <span class="login-and-signup-text">Facebook</span>
+            </div>
+          </div>
+    
+          <div class="login-and-signup-info">
+            <input type="text" id="email"  class="input-gray" placeholder="email" /> 
+            <input type="password" id="password"  class="input-gray" placeholder="password" />
+            <p class="forget-password">Forget your password?</p>
+          </div>
+    
+          <div class="submit-login-info" onclick="signupByEmail()">Login / Signup</div>
+      </div>
+    </div>
+  </div>
 </body>
 <script defer src="https://www.gstatic.com/firebasejs/8.0.2/firebase-app.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/8.0.2/firebase-analytics.js"></script>
@@ -69,4 +103,5 @@
 <script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script defer src="../assets/js/md5.js"></script>
 <script defer src="../assets/js/index.js"></script>
+
 </html>

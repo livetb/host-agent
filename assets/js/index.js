@@ -162,6 +162,9 @@ function md5Login(firebaseUid, requestTime) {
     var str = firebaseUid + requestTime + key;
     return hex_md5(str).toUpperCase();
 }
+function isLogin(){
+    return (storageHelper.getItem("token"));
+}
 function login() {
     console.log("Login => ", config.user);
     let url = getUrl("/api2/user/login");
@@ -170,7 +173,7 @@ function login() {
         appId: "302",
         appKey: "fjsihWdgr;_#78JI9&)!kjdfgLKGRFeu342",
         loginId: config.user.email,
-        thirdType: +storageHelper.getItem("thirdType") || 1,
+        thirdType: 1,
         deviceCode: storageHelper.getItem("deviceCode") || storageHelper.setItem("deviceCode", Math.random().toString().substr(2)),
         deviceType: 4,
         requestTime: requestTime,
@@ -182,8 +185,14 @@ function login() {
         if (res.data.status == 0) {
             console.log("Login Success => ", res.data);
             storageHelper.setItem("token", res.data.data.token);
-            alert("Login Success");
-            window.location.href = "../agent/";
+            if(typeof config.loginCall === "function") {
+                config.loginCall = null;
+            }
+            else{
+                alert("Login Success");
+                window.location.href = "../agent/";
+            }
+            dialog(false, ".dialog-login");
         } else if (res.data.status == 2001) alert(res.data.msg);
     }).catch(error => console.error(error));
 }
@@ -202,7 +211,7 @@ firebase.auth().onAuthStateChanged(function (user) {
         var isAnonymous = user.isAnonymous;
         var uid = user.uid;
         var providerData = user.providerData;
-        if(/\/login\//.test(location.pathname)) login();
+        if(/\/login\//.test(location.pathname) || config.inLogin) login();
     } else {
         // User is signed out.
         // ...
@@ -282,26 +291,34 @@ function loginByEmail(email, password) {
         return;
     }
     document.querySelector(".login-and-signup").classList.add("upload-await");
-    storageHelper.setItem("thirdType", "1");
+    config.inLogin = true;
     firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) {
         // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        storageHelper.removeItems("thirdType");
         document.querySelector(".login-and-signup").classList.remove("upload-await");
         console.log("SignupByEmail Failed => ", error);
+        config.inLogin = false;
+        alert("Login Failed");
         // ...
     });
 }
-function loginByGoogle(){
-    console.log("Login By Google");
-    var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithRedirect(provider);
-}
-function loginByFacebook(){
-    console.log("Login By Facebook");
-    var provider = new firebase.auth.FacebookAuthProvider();
-    firebase.auth().signInWithRedirect(provider);
+function loginByOther(method){
+    console.log("Login By ",method);
+    let provider = null;
+    switch(method){
+        case "Google":
+            provider = new firebase.auth.GoogleAuthProvider(); break;
+        case "Facebook": 
+            provider = new firebase.auth.FacebookAuthProvider(); break;
+        default : provider = new firebase.auth.GoogleAuthProvider();
+    }
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+        var token = result.credential.accessToken;
+        config.user = result.user;
+        login();
+        config.loginCall = null;
+      }).catch(function(error) {
+        console.error(error);
+      });
 }
 firebase.auth().getRedirectResult().then(function(result) {
     console.log("Firebase auth redirect");
@@ -369,6 +386,13 @@ function chooseImage(ele) {
 var submitApply = (() => {
     var inSubmit = false;
     return async function(){
+        if(!isLogin()){
+            dialog(true, ".dialog-login");
+            config.loginCall = function(){
+                dialog(false, ".dialog-login");
+            }
+            return;
+        }
         if(inSubmit){
             console.log("in submit...");
             return;
@@ -428,6 +452,13 @@ var submitApply = (() => {
         inSubmit = false;
     }
 })();
+
+function changeApplyType(ele){
+    let value = ele.value;
+    if(!ele.checked) return;
+    if(value === "agent") showView(document.querySelector(".only-host-view"), "none");
+    else showView(document.querySelector(".only-host-view"), "block");
+}
 
 /* ------------------------------------ Agent Page ------------------------------------ */
 var agentConfig = {
@@ -1055,7 +1086,7 @@ function initPage() {
     config.relateUid = getQueryParamter("uid");
     let path = location.pathname;
     console.log("Init Page => ", path);
-    if(!storageHelper.getItem("token") && !/\/login\//.test(path)) window.location.href = "../login/";
+    if(!storageHelper.getItem("token") && !/\/login\//.test(path) && !/\/apply\//.test(path)) window.location.href = "../login/";
     if(/\/index.html/.test(path)) window.location.href = path.replace("index.html", "");
     if (/\/login\//.test(path)) initLoginPage();
     else if (/\/agent\//.test(path)) initAgentPage();
