@@ -658,14 +658,6 @@ function agentGetHostList(){
 
 async function initAgentPage() {
     console.log("Init AgentPage");
-    document.querySelector("#dialog-modal").addEventListener("click", function (event) {
-        if (event.target.id === "dialog-modal") {
-            console.log("You Click dialog-modal");
-            config.dialogs.forEach((v, k) => {
-                if (v && k.getAttribute("uncancellable") !== "true") dialog(false, "#" + k.id);
-            });
-        }
-    });
     await getSelfInfo(renderAgentSelfInfo);
     agentGetHostList();
     agentInputNewHostUid = createAgentInputNewHostUid();
@@ -1092,5 +1084,15 @@ function initPage() {
     else if (/\/agent\//.test(path)) initAgentPage();
     else if (/\/host\//.test(path)) initHostPage();
     else initApplyPage();
+
+    let modal = document.querySelector("#dialog-modal");
+    if(modal) modal.addEventListener("click", function (event) {
+        if (event.target.id === "dialog-modal") {
+            console.log("You Click dialog-modal");
+            config.dialogs.forEach((v, k) => {
+                if (v && k.getAttribute("uncancellable") !== "true") dialog(false, "#" + k.id);
+            });
+        }
+    });
 }
 initPage();
