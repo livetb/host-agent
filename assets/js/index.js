@@ -183,7 +183,7 @@ function login() {
             console.log("Login Success => ", res.data);
             storageHelper.setItem("token", res.data.data.token);
             alert("Login Success");
-            window.location.href = "/agent/";
+            window.location.href = "../agent/";
         } else if (res.data.status == 2001) alert(res.data.msg);
     }).catch(error => console.error(error));
 }
@@ -599,7 +599,7 @@ function renderAgentHostList(arr){
     arr.forEach(value => {
         itemNode = document.createElement("div");
         itemNode.setAttribute("class", "agent-host-item");
-        itemNode.innerHTML = `<div class="uid"><a href="../../host/${value.isSelf ? "" : "?uid="+value.uid}">${value.uid}</a></div><div class="nickname">${value.nickname}</div><div class="avatar"><img src="${value.avatar}"></div><div class="other-info">${value.otherInfo || "No Other Info"}</div><div class="time-of-calls">${value.calls}</div><div class="work-hours">${(value.minutes / 60).toFixed(2)}</div><div class="status">Invalid</div><div class="manage"><span onclick="agentDeleteHost(this)" class="delete manage-option">Delete</span><label class="freeze"><input onchange="agentFreezeHost(this)" type="checkbox" class="agent-freeze-host" /><span class="manage-option">Freeze</span></label></div>`;
+        itemNode.innerHTML = `<div class="uid"><a href="../host/${value.isSelf ? "" : "?uid="+value.uid}">${value.uid}</a></div><div class="nickname">${value.nickname}</div><div class="avatar"><img src="${value.avatar}"></div><div class="other-info">${value.otherInfo || "No Other Info"}</div><div class="time-of-calls">${value.calls}</div><div class="work-hours">${(value.minutes / 60).toFixed(2)}</div><div class="status">Invalid</div><div class="manage"><span onclick="agentDeleteHost(this)" class="delete manage-option">Delete</span><label class="freeze"><input onchange="agentFreezeHost(this)" type="checkbox" class="agent-freeze-host" /><span class="manage-option">Freeze</span></label></div>`;
         listNode.appendChild(itemNode);
     });
 }
@@ -755,7 +755,9 @@ async function initHostLogs(){
 async function initHostMediaList(){
     let url = getUrl("/api/user/mediaList");
     let resultObj = { success: false};
-    await axios.post(url, {}, { headers: getHeaders()}).then(res => {
+    let dataObj = {}
+    if(config.relateUid) dataObj.relateUid = config.relateUid;
+    await axios.post(url, dataObj, { headers: getHeaders()}).then(res => {
         if(res.data.status === 0){
             resultObj.success = true;
             resultObj.data = res.data.data;
