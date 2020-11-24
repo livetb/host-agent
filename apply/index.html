@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1.0, width=device-width, maximum-scale=1.0, minimal-ui">
+  <title>Home</title>
+  <link rel="stylesheet" href="../assets/css/index.css" />
+  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+</head>
+
+<body>
+  <div class="auto-margin">
+    <h1 class="header-title">Apply to be an </h1>
+    <div class="content-block-1 role-items">
+      <label class="role-label">
+        <input class="role apply-agent" checked name="role" value="agent" type="radio" /> <span>Agent</span>
+      </label>
+      <label class="role-label">
+        <input class="role apply-host" name="role" value="host" type="radio" /> <span>Host</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="auto-margin">
+    <!-- <h2 class="content-block-title">What to Apply</h2> -->
+    <div class="content-block-1 apply-info">
+      <input class="input-gray contact-info" name="phone" type="text" placeholder="Phone Number" />
+      <input class="input-gray contact-info" name="email" type="text" placeholder="Email Adress" />
+      <textarea class="input-gray contact-info" name="reason" type="text" placeholder="Why to apply……"></textarea>
+    </div>
+  </div>
+
+  <div class="auto-margin">
+    <h2 class="content-block-title">Upload Your Photo (at least 1 photo)</h2>
+    <div class="image-list content-block-1">
+        <img src="../assets/img/photo-1.png" />
+        <img src="../assets/img/photo-2.png" />
+        <label class="upload-image">
+            <input id="uploadImage" class="input-file" type="file" onchange="chooseImage(this)" /> <span>+</span>
+        </label>
+    </div>
+  </div>
+
+  <div class="auto-margin">
+    <h2 class="content-block-title">Social Media Link</h2>
+    <div class="social-items">
+      <div class="social-icon icon_facebook-icon"></div>
+      <input name="facebookLink" class="input-gray social-link" type="text" />
+      <div class="social-icon icon_instagram-icon"></div>
+      <input name="instagramLink" class="input-gray social-link" type="text" />
+      <div class="social-icon icon_tiktok-cion"></div>
+      <input name="tiktokLink" class="input-gray social-link" type="text" />
+      <div class="social-icon icon_youtube-icon"></div>
+      <input name="youtubeLink" class="input-gray social-link" type="text" />
+    </div>
+  </div>
+
+  <div class="auto-margin">
+    <div class="content-block-1 submit-info" onclick="submitApply()">Submit</div>
+  </div>
+</body>
+<script defer src="https://www.gstatic.com/firebasejs/8.0.2/firebase-app.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/8.0.2/firebase-analytics.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/7.23.0/firebase-auth.js"></script>
+<script defer src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script defer src="../assets/js/md5.js"></script>
+<script defer src="../assets/js/index.js"></script>
+</html>

@@ -1053,7 +1053,7 @@ function initPage() {
     config.relateUid = getQueryParamter("uid");
     let path = location.pathname;
     console.log("Init Page => ", path);
-    if(!storageHelper.getItem("token") && !/\/login\//.test(path)) window.location.href = "../../login/";
+    if(!storageHelper.getItem("token") && !/\/login\//.test(path)) window.location.href = "../login/";
     if(/\/index.html/.test(path)) window.location.href = path.replace("index.html", "");
     if (/\/login\//.test(path)) initLoginPage();
     else if (/\/agent\//.test(path)) initAgentPage();
