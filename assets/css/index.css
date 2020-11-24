@@ -881,6 +881,9 @@ input.create-new-host:checked + span::before {
     .host-info-statistic-table {
         grid-template-columns: repeat(3, 1fr);
     }
+    .host-info-statistic-table > .item > .content{
+        height: 50px;
+    }
 }
 /* Gift Logs */
 .host-info-gift-logs-container {
@@ -1017,11 +1020,23 @@ input.create-new-host:checked + span::before {
     .host-info-call-logs-container {
         width: 100%;
     }
-    .host-info-call-log-table {
-        grid-template-columns: repeat(auto-fill, max-content);
+    .host-info-call-log-table > .title.nickname {
+        display: none;
+    }
+    .host-info-call-log-table > .title.avatar-title {
+        display: none;
+    }
+    .host-info-call-log-table > .host-avatar {
+        display: none;
+    }
+    .host-info-call-log-table > .host-name {
+        display: none;
     }
     .host-info-call-log-table > * {
         padding: 5px;
+    }
+    .host-info-call-log-table {
+        grid-template-columns: min-content min-content auto min-content;
     }
 }
 /*  */

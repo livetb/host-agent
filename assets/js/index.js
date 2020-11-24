@@ -154,6 +154,7 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
+var firebaseUI = null;
 
 /** login */
 function md5Login(firebaseUid, requestTime) {
@@ -161,7 +162,7 @@ function md5Login(firebaseUid, requestTime) {
     var str = firebaseUid + requestTime + key;
     return hex_md5(str).toUpperCase();
 }
-function login(isManul) {
+function login() {
     console.log("Login => ", config.user);
     let url = getUrl("/api2/user/login");
     let requestTime = Date.now();
@@ -292,6 +293,36 @@ function loginByEmail(email, password) {
         // ...
     });
 }
+function loginByGoogle(){
+    console.log("Login By Google");
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithRedirect(provider);
+}
+function loginByFacebook(){
+    console.log("Login By Facebook");
+    var provider = new firebase.auth.FacebookAuthProvider();
+    firebase.auth().signInWithRedirect(provider);
+}
+firebase.auth().getRedirectResult().then(function(result) {
+    console.log("Firebase auth redirect");
+    if (result.credential) {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      var token = result.credential.accessToken;
+      console.log("Firebase Redirect token => ", token);
+    }
+    // The signed-in user info.
+    var user = result.user;
+  }).catch(function(error) {
+      console.log("Firebase Redirect Error => ", error);
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    // The email of the user's account used.
+    var email = error.email;
+    // The firebase.auth.AuthCredential type that was used.
+    var credential = error.credential;
+    // ...
+  });
 function logout() {
     firebase.auth().signOut().then(function () {
         console.log("Logout Success");
@@ -568,7 +599,7 @@ function renderAgentHostList(arr){
     arr.forEach(value => {
         itemNode = document.createElement("div");
         itemNode.setAttribute("class", "agent-host-item");
-        itemNode.innerHTML = `<div class="uid"><a href="../../host/?uid=${value.uid}">${value.uid}</a></div><div class="nickname">${value.nickname}</div><div class="avatar"><img src="${value.avatar}"></div><div class="other-info">${value.otherInfo || "No Other Info"}</div><div class="time-of-calls">${value.calls}</div><div class="work-hours">${(value.minutes / 60).toFixed(2)}</div><div class="status">Invalid</div><div class="manage"><span onclick="agentDeleteHost(this)" class="delete manage-option">Delete</span><label class="freeze"><input onchange="agentFreezeHost(this)" type="checkbox" class="agent-freeze-host" /><span class="manage-option">Freeze</span></label></div>`;
+        itemNode.innerHTML = `<div class="uid"><a href="../../host/${value.isSelf ? "" : "?uid="+value.uid}">${value.uid}</a></div><div class="nickname">${value.nickname}</div><div class="avatar"><img src="${value.avatar}"></div><div class="other-info">${value.otherInfo || "No Other Info"}</div><div class="time-of-calls">${value.calls}</div><div class="work-hours">${(value.minutes / 60).toFixed(2)}</div><div class="status">Invalid</div><div class="manage"><span onclick="agentDeleteHost(this)" class="delete manage-option">Delete</span><label class="freeze"><input onchange="agentFreezeHost(this)" type="checkbox" class="agent-freeze-host" /><span class="manage-option">Freeze</span></label></div>`;
         listNode.appendChild(itemNode);
     });
 }
@@ -576,6 +607,7 @@ function renderAgentHostList(arr){
 function renderAgentSelfInfo(obj){
     if(!obj.success) return;
     let data = obj.data;
+    data.isSelf = true;
     document.querySelector(".agent-info-container .uid").innerText = data.uid;
     document.querySelector(".agent-info-container .status").innerText = data.status;
     console.log("renderAgentSelfInfo => ", obj);
@@ -650,6 +682,25 @@ function renderHostStatisticLogs(obj){
 }
 function renderHostGiftLogs(obj){
     console.log("renderHostGiftLogs => ", obj);
+    if(obj.status !== 0) return;
+    let data = obj.data;
+    let defaultValue = 666;
+    document.querySelector(".host-info-gift-logs-header .total").innerText = data.total || defaultValue;
+    document.querySelector(".host-info-gift-logs-header .lastWeeklyDiamond").innerText = data.lastWeeklyDiamond || defaultValue;
+    let records = data.recordList;
+    if(!records || records.length < 1) records = [{giftName: "gift1"},{giftName: "gift2"},{giftName: "gift3"},{giftName: "gift4"}];
+    let callLogTable = document.querySelector(".host-info-call-logs-container .host-info-call-log-table");
+    let logHTML = new Array();
+    let giftIcons = ["../assets/img/photo-2.png", "../assets/img/photo-1.png", "../assets/img/facebook-icon.png", "../assets/img/tiktok-icon.png"]
+    let defaultNum = 1;
+    let giftData = {
+        gitf1:{ num: 0, price: 100}
+    }
+    records.forEach(value => {
+        switch(value.giftName){
+            case "gift1": 
+        }
+    });
 }
 function renderHostCallLogs(obj){
     console.log("renderHostCallLogs => ", obj);
@@ -666,7 +717,7 @@ function renderHostCallLogs(obj){
         let item = `
         <span class="chat-type" style="display: ${value.chatType === "answer" ? "flex" : "none"};"><svg class="icon" viewBox="0 0 1026 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3711" width="20" height="20"><path d="M1003.303907 809.923646L844.81501 651.410065c-31.569428-31.433672-83.847809-30.483381-116.515627 2.196778l-79.836839 79.84918c-5.047653-2.801509-10.268086-5.70175-15.760031-8.787112-50.427164-27.928701-119.452892-66.248902-192.082323-138.903017-72.814553-72.814553-111.171779-141.926672-139.186871-192.415543-2.974289-5.356189-5.800481-10.502574-8.639014-15.389788l53.586574-53.524867 26.398361-26.38602c32.717183-32.717183 33.630451-84.995564 2.110388-116.515626L216.400731 22.995786c-31.49538-31.483038-83.798444-30.532747-116.515627 2.196778l-44.676048 44.922877 1.234145 1.234145a257.553714 257.553714 0 0 0-36.802203 64.916026 268.710385 268.710385 0 0 0-16.389446 65.841634c-20.980465 173.508442 58.350374 332.071388 273.523551 547.269247 297.428939 297.428939 537.124575 274.942817 547.46671 273.832087a267.661362 267.661362 0 0 0 66.039098-16.586909 257.936299 257.936299 0 0 0 64.693879-36.641764l0.974975 0.85156 45.256096-44.318146c32.655476-32.717183 33.593426-84.995564 2.098046-116.589675z" p-id="3712" fill="#000000"></path><path d="M841.112575 110.237494l94.128237 94.671261-235.956178 236.005544 94.239311 94.362724-283.372028-0.111073V252.201191l94.510822 94.288676L841.112575 110.237494z" p-id="3713" fill="#000000"></path></svg></span>
         <span class="chat-type" style="display: ${value.chatType !== "answer" ? "flex" : "none"};"><svg class="icon" viewBox="0 0 1026 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2834" width="20" height="20"><path d="M1003.269016 809.896692L844.787063 651.390065c-31.570553-31.434845-83.89205-30.472554-116.52359 2.195998l-79.845493 79.845493c-5.04586-2.788177-10.264439-5.687388-15.754434-8.783991-50.42159-27.88177-119.435138-66.225372-192.063447-138.915366-72.788691-72.788691-111.169304-141.950284-139.186781-192.458234-2.973233-5.354287-5.798421-10.498843-8.635947-15.384321l53.592216-53.530531 26.339637-26.376647c32.7179-32.7179 33.630843-84.990049 2.121975-116.523591L216.386257 23.001596c-31.49653-31.49653-83.793354-30.534239-116.52359 2.195998l-44.66018 44.919258 1.233706 1.233707a258.190122 258.190122 0 0 0-36.838479 64.905305 269.120763 269.120763 0 0 0-16.35895 65.793575c-20.923664 173.557848 58.304975 332.113823 273.525095 547.296932 297.409656 297.397319 537.106516 274.943858 547.444978 273.882871a267.3689 267.3689 0 0 0 66.040315-16.593354 257.289516 257.289516 0 0 0 64.695576-36.641087l0.974628 0.851258 45.252359-44.302405c32.643877-32.730237 33.593831-84.990049 2.097301-116.597613z" p-id="2835" fill="#000000"></path><path d="M576.67794 547.006148l-100.941876-103.767064 253.057902-258.683605-101.077583-103.409289 303.923627 0.111033v310.153845l-101.361337-103.35994-253.600733 258.95502z" p-id="2836" fill="#000000"></path></svg></span>
-        <div><img class="avatar" src="${value.avatar ? value.avatar : "../assets/img/photo-2.png"}" /></div>
+        <div class="host-avatar"><img class="avatar" src="${value.avatar ? value.avatar : "../assets/img/photo-2.png"}" /></div>
         <span class="host-name">${value.nickname ? value.nickname : "Nickname"}</span>
         <span class="chat-duration">${value.seconds ? (+value.seconds).toFixed(0) : 2}mins</span>
         <div class="chat-info">
@@ -946,6 +997,7 @@ var hostSetMediaItemTag = (() => {
                 delay = setTimeout(async () => {
                     console.log(`${fileId} / ${tags.join(",")} / ${typeof call}`);
                     let result = await hostUpdateMediaItemTag(fileId, tags);
+                    if(typeof call === "function") call(result);
                     if(result.success) console.log("Update Media Tag Success");
                 }, 1500);
             }
@@ -961,13 +1013,17 @@ async function hostManageMediaItem(event){
     if(!cur.classList.contains("btn-2")) return;
     let fileId = this.getAttribute("file-id");
     if(!fileId) return;
+    let parent = parentByClass(cur, "host-already-upload-item");
     let tags = new Array();
     if(cur.classList.contains("delete")){
+        var x = confirm("Delete Confirm?");
+        if(!x) return;
         tags.push("delete");
-        hostSetMediaItemTag(fileId)(tags, console.warn);
+        hostSetMediaItemTag(fileId)(tags, function(){
+            parent.remove();
+        });
         return;
     }
-    let parent = parentByClass(cur, "host-already-upload-item");
     let inputs = parent.querySelectorAll("input");
     inputs.forEach(element => {
         if(element.checked) tags.push(element.value.toLowerCase());
@@ -997,6 +1053,8 @@ function initPage() {
     config.relateUid = getQueryParamter("uid");
     let path = location.pathname;
     console.log("Init Page => ", path);
+    if(!storageHelper.getItem("token") && !/\/login\//.test(path)) window.location.href = "../../login/";
+    if(/\/index.html/.test(path)) window.location.href = path.replace("index.html", "");
     if (/\/login\//.test(path)) initLoginPage();
     else if (/\/agent\//.test(path)) initAgentPage();
     else if (/\/host\//.test(path)) initHostPage();
